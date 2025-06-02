@@ -13,7 +13,7 @@ public class Like {
     @Column(name = "liker_id")
     private Integer likerId;
 
-    @Column(name = "liked_post_id")
+    @Column(name = "post_id")
     private Integer likedPostId;
 
     public Integer getId() {
