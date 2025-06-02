@@ -16,5 +16,27 @@ public class Like {
     @Column(name = "liked_post_id")
     private Integer likedPostId;
 
+    public Integer getId() {
+        return id;
+    }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getLikerId() {
+        return likerId;
+    }
+
+    public void setLikerId(Integer likerId) {
+        this.likerId = likerId;
+    }
+
+    public Integer getLikedPostId() {
+        return likedPostId;
+    }
+
+    public void setLikedPostId(Integer likedPostId) {
+        this.likedPostId = likedPostId;
+    }
 }

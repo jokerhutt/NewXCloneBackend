@@ -14,3 +14,7 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
     boolean existsByLikerIdAndLikedPostId(Integer likerId, Integer likedPostId);
     Optional<Like> findByLikerIdAndLikedPostId(Integer likerId, Integer likedPostId);
 }
+
+
+
+
