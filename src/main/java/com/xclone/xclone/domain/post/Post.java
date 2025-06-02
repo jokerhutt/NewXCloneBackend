@@ -1,0 +1,43 @@
+package com.xclone.xclone.domain.post;
+
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "posts")
+public class Post {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(nullable = false, length = 180)
+    private String text;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+}
