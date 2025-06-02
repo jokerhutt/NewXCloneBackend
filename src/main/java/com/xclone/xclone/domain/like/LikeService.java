@@ -17,7 +17,7 @@ public class LikeService {
         this.likeRepository = likeRepository;
     }
 
-    public ArrayList<Integer> getAllUserBookmarks (Integer likerId) {
+    public ArrayList<Integer> getAllUserLikes (Integer likerId) {
         ArrayList<Integer> likeIds = new ArrayList<>();
         ArrayList<Like> likes =  likeRepository.findAllByLikerId(likerId);
         for (Like like : likes) {
