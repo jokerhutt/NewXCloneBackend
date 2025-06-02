@@ -14,8 +14,9 @@ public class UserDTO {
     public String displayName;
     public ArrayList<Integer> posts;
     public ArrayList<Integer> bookmarkedPosts;
+    public ArrayList<Integer> likedPosts;
 
-    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts) {
+    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
@@ -25,5 +26,6 @@ public class UserDTO {
         this.bannerImage = Base64.getEncoder().encodeToString(user.getBannerImage());
         this.posts = posts;
         this.bookmarkedPosts = bookmarkedPosts;
+        this.likedPosts = likedPosts;
     }
 }

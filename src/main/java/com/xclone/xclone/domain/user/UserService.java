@@ -1,6 +1,7 @@
 package com.xclone.xclone.domain.user;
 
 import com.xclone.xclone.domain.bookmark.BookmarkService;
+import com.xclone.xclone.domain.like.LikeService;
 import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.post.PostService;
@@ -26,12 +27,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PostService postService;
     private final BookmarkService bookmarkService;
+    private final LikeService likeService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService) {
+    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService) {
         this.userRepository = userRepository;
         this.postService = postService;
         this.bookmarkService = bookmarkService;
+        this.likeService = likeService;
     }
 
 
@@ -41,8 +44,9 @@ public class UserService {
         Optional<User> user = this.findById(id);
         ArrayList<Integer> userPosts = postService.findAllPostsByUserId(id);
         ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(id);
+        ArrayList<Integer> userLikes = likeService.getAllUserLikes(id);
         if (user.isPresent()) {
-            return new UserDTO(user.get(), userPosts, userBookmarks);
+            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes);
         } else {
             return null;
         }
@@ -56,7 +60,9 @@ public class UserService {
         userRepository.findAllById(ids).forEach(user -> {
             ArrayList<Integer> userPosts = postService.findAllPostsByUserId(user.getId());
             ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(user.getId());
-            userDTOs.add(new UserDTO(user, userPosts, userBookmarks));
+            ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
+
+            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes));
         });
         return userDTOs;
     }
