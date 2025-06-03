@@ -3,6 +3,8 @@ package com.xclone.xclone.domain.post;
 
 import jakarta.persistence.*;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -16,6 +18,13 @@ public class Post {
 
     @Column(nullable = false, length = 180)
     private String text;
+
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private java.sql.Timestamp createdAt;
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
 
     public Integer getId() {
         return id;
