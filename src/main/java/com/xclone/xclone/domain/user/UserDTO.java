@@ -15,8 +15,10 @@ public class UserDTO {
     public ArrayList<Integer> posts;
     public ArrayList<Integer> bookmarkedPosts;
     public ArrayList<Integer> likedPosts;
+    public ArrayList<Integer> followers;
+    public ArrayList<Integer> following;
 
-    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts) {
+    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
@@ -27,5 +29,7 @@ public class UserDTO {
         this.posts = posts;
         this.bookmarkedPosts = bookmarkedPosts;
         this.likedPosts = likedPosts;
+        this.followers = followers;
+        this.following = following;
     }
 }

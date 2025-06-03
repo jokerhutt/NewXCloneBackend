@@ -1,6 +1,7 @@
 package com.xclone.xclone.domain.user;
 
 import com.xclone.xclone.domain.bookmark.BookmarkService;
+import com.xclone.xclone.domain.follow.FollowService;
 import com.xclone.xclone.domain.like.LikeService;
 import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostDTO;
@@ -28,13 +29,15 @@ public class UserService {
     private final PostService postService;
     private final BookmarkService bookmarkService;
     private final LikeService likeService;
+    private final FollowService followService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService) {
+    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, FollowService followService) {
         this.userRepository = userRepository;
         this.postService = postService;
         this.bookmarkService = bookmarkService;
         this.likeService = likeService;
+        this.followService = followService;
     }
 
 
@@ -61,6 +64,8 @@ public class UserService {
             ArrayList<Integer> userPosts = postService.findAllPostsByUserId(user.getId());
             ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(user.getId());
             ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
+            ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
+            ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
 
             userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes));
         });
