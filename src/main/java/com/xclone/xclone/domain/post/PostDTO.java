@@ -8,11 +8,13 @@ public class PostDTO {
     public Integer userId;
     public String text;
     public ArrayList<Integer> likedBy;
+    public ArrayList<Integer> bookmarkedBy;
 
-    public PostDTO(Post post, ArrayList<Integer> likedBy) {
+    public PostDTO(Post post, ArrayList<Integer> likedBy, ArrayList<Integer> bookmarkedBy) {
         this.id = post.getId();
         this.userId = post.getUserId();
         this.text = post.getText();
         this.likedBy = likedBy;
+        this.bookmarkedBy = bookmarkedBy;
     }
 }

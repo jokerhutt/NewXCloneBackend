@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
     Optional<Bookmark> findById(int id);
     ArrayList<Bookmark> findAllByBookmarkedBy(int id);
+    ArrayList<Bookmark> findAllByBookmarkedPost(Integer bookmarkedPost);
     boolean existsByBookmarkedByAndBookmarkedPost(Integer bookmarkedBy, Integer bookmarkedPost);
     Optional<Bookmark> findByBookmarkedByAndBookmarkedPost(Integer bookmarkedBy, Integer bookmarkedPost);
 }
