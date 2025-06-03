@@ -31,7 +31,7 @@ public class FollowService {
     public ArrayList<Integer> getAllUserFollowers (Integer userId) {
 
         ArrayList<Integer> followerUserIds = new ArrayList<>();
-        ArrayList<Follow> follows = followRepository.findAllByFollowerId(userId);
+        ArrayList<Follow> follows = followRepository.findAllByFollowedId((userId));
         for (Follow follow : follows) {
             followerUserIds.add(follow.getFollowerId());
         }
