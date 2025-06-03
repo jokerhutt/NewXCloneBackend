@@ -9,10 +9,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/follows")
 public class FollowController {
 
-    private final BookmarkService bookmarkService;
+    private final FollowService followService;
 
-    public FollowController(BookmarkService bookmarkService) {
-        this.bookmarkService = bookmarkService;
+    public FollowController(FollowService followService) {
+        this.followService = followService;
+    }
+
+    @PostMapping("/followUser")
+    public ResponseEntity<?> createFollow (@RequestBody NewFollow newFollow) {
+
+        if (followService.)
+
     }
 
 
