@@ -48,8 +48,10 @@ public class UserService {
         ArrayList<Integer> userPosts = postService.findAllPostsByUserId(id);
         ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(id);
         ArrayList<Integer> userLikes = likeService.getAllUserLikes(id);
+        ArrayList<Integer> userFollowing = followService.getAllUserFollowing(id);
+        ArrayList<Integer> userFollowers = followService.getAllUserFollowers(id);
         if (user.isPresent()) {
-            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes);
+            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes, userFollowers, userFollowing);
         } else {
             return null;
         }
@@ -67,7 +69,7 @@ public class UserService {
             ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
             ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
 
-            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes));
+            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing));
         });
         return userDTOs;
     }
