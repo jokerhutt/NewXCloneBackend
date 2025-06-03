@@ -20,7 +20,7 @@ public class Post {
     private String text;
 
     @Column(name = "created_at", updatable = false, insertable = false)
-    private java.sql.Timestamp createdAt;
+    private Timestamp createdAt;
 
     public Timestamp getCreatedAt() {
         return createdAt;

@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.post;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class PostDTO {
@@ -7,6 +8,7 @@ public class PostDTO {
     public Integer id;
     public Integer userId;
     public String text;
+    public Timestamp createdAt;
     public ArrayList<Integer> likedBy;
     public ArrayList<Integer> bookmarkedBy;
 
@@ -16,5 +18,6 @@ public class PostDTO {
         this.text = post.getText();
         this.likedBy = likedBy;
         this.bookmarkedBy = bookmarkedBy;
+        this.createdAt = post.getCreatedAt();
     }
 }
