@@ -18,8 +18,21 @@ public class FollowController {
     @PostMapping("/followUser")
     public ResponseEntity<?> createFollow (@RequestBody NewFollow newFollow) {
 
-        if (followService.)
+        if (followService.addNewFollow(newFollow.followerId, newFollow.followedId)) {
+            return ResponseEntity.ok("SUCCESS");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("NOTSUCCESS");
+        }
 
+    }
+
+    @PostMapping("/unfollowUser")
+    public ResponseEntity<?> unfollowUser (@RequestBody NewFollow newFollow) {
+        if (followService.deleteFollow(newFollow.followerId, newFollow.followedId)) {
+            return ResponseEntity.ok("SUCCESS");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("NOTSUCCESS");
+        }
     }
 
 
