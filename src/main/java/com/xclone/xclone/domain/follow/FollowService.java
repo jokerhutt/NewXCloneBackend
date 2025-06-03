@@ -22,9 +22,20 @@ public class FollowService {
         ArrayList<Integer> followingUserIds = new ArrayList<>();
         ArrayList<Follow> follows = followRepository.findAllByFollowerId(userId);
         for (Follow follow : follows) {
-            followingUserIds.add(follow.getFollowerId());
+            followingUserIds.add(follow.getFollowedId());
         }
         return followingUserIds;
+
+    }
+
+    public ArrayList<Integer> getAllUserFollowers (Integer userId) {
+
+        ArrayList<Integer> followerUserIds = new ArrayList<>();
+        ArrayList<Follow> follows = followRepository.findAllByFollowerId(userId);
+        for (Follow follow : follows) {
+            followerUserIds.add(follow.getFollowerId());
+        }
+        return followerUserIds;
 
     }
 
