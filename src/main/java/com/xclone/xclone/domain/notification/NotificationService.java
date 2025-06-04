@@ -57,6 +57,28 @@ public class NotificationService {
 
     }
 
+    public void markAllAsSeen(ArrayList<NotificationDTO> notificationDTOs) {
+
+        for (int i = 0; i < notificationDTOs.size(); i++) {
+            markAsSeen(notificationDTOs.get(i));
+        }
+
+    }
+
+    @Transactional
+    public boolean markAsSeen (NotificationDTO notificationDTO) {
+
+        Optional<Notification> notification = notificationRepository.findById(notificationDTO.id);
+
+            if (!notification.isPresent()) return false;
+            if (notification.get().isSeen()) return false;
+
+            notification.get().setSeen(true);
+            notificationRepository.save(notification.get());
+
+            return true;
+    }
+
     public boolean checkExistingNotification(NewNotification newNotification) {
         if (newNotification.type.equals("follow")) {
             if (notificationRepository.existsBySenderIdAndReceiverIdAndType(newNotification.senderId, newNotification.receiverId, newNotification.type)) {
