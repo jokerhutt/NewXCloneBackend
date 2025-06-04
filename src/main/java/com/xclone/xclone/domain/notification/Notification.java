@@ -20,8 +20,11 @@ public class Notification {
     @Column(name = "type")
     private String type;
 
-    @Column(name = "postId", nullable = true)
-    private Integer postId;
+    @Column(name = "reference_id")
+    private Integer referenceId;
+
+    @Column(name = "text")
+    private String text;
 
     @Column(name = "seen")
     private boolean seen;
@@ -65,12 +68,20 @@ public class Notification {
         this.type = type;
     }
 
-    public Integer getPostId() {
-        return postId;
+    public Integer getReferenceId() {
+        return referenceId;
     }
 
-    public void setPostId(Integer postId) {
-        this.postId = postId;
+    public void setReferenceId(Integer referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public boolean isSeen() {

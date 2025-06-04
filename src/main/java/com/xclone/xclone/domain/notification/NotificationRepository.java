@@ -15,12 +15,17 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     boolean existsBySenderIdAndReceiverIdAndCreatedAt(Integer senderId, Integer receiverId, Timestamp createdAt);
 
-    boolean existsBySenderIdAndReceiverIdAndTypeAndPostId(Integer senderId, Integer receiverId, String type, Integer postId);
-
     boolean existsBySenderIdAndReceiverIdAndType(Integer senderId, Integer receiverId, String type);
 
     @Modifying
     @Query("UPDATE Notification n SET n.seen = true WHERE n.receiverId = :receiverId AND n.seen = false")
     int markAllAsSeen(@Param("receiverId") Integer receiverId);
 
+    boolean existsBySenderIdAndReceiverIdAndTypeAndReferenceIdAndText(Integer senderId, Integer receiverId, String type, Integer referenceId, String text);
+
+    Notification findBySenderIdAndReceiverIdAndTypeAndReferenceIdAndText(Integer senderId, Integer receiverId, String type, Integer referenceId, String text);
+
+    Notification findBySenderIdAndReceiverIdAndTypeAndReferenceId(Integer senderId, Integer receiverId, String type, Integer referenceId);
+
+    boolean existsBySenderIdAndReceiverIdAndTypeAndReferenceId(Integer senderId, Integer receiverId, String type, Integer referenceId);
 }

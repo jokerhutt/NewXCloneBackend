@@ -24,18 +24,17 @@ public class NotificationController {
         }
     }
 
-    @PostMapping("/markAsSeen")
-    public ResponseEntity<?> markAllNotificationsAsSeen(@RequestBody Integer id) {
+    @GetMapping("/markAsSeen/{id}")
+    public ResponseEntity<?> markAllNotificationsAsSeen(@PathVariable Integer id) {
         notificationService.markAllReceiverNotificationsAsSeen(id);
         return ResponseEntity.ok("SUCCESS");
     }
 
     @GetMapping("/getAllNotifications/{receiverId}")
-    public ResponseEntity<?> getAllNotificationsForUser(@RequestParam Integer receiverId) {
-
+    public ResponseEntity<?> getAllNotificationsForUser(@PathVariable Integer receiverId) {
         ArrayList<NotificationDTO> toReturn = notificationService.getUsersNotifications(receiverId);
+        System.out.println(toReturn.size());
         return ResponseEntity.ok(toReturn);
-
     }
 
 }

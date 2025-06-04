@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.follow;
 
+import com.xclone.xclone.domain.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,11 +11,13 @@ import java.util.Optional;
 @Service
 public class FollowService {
 
+    private final NotificationService notificationService;
     private FollowRepository followRepository;
 
     @Autowired
-    public FollowService(FollowRepository followRepository) {
+    public FollowService(FollowRepository followRepository, NotificationService notificationService) {
         this.followRepository = followRepository;
+        this.notificationService = notificationService;
     }
 
     public ArrayList<Integer> getAllUserFollowing (Integer userId) {
@@ -49,6 +52,7 @@ public class FollowService {
             return false;
         } else {
             followRepository.save(follow);
+            notificationService.addFollowNotification(followerId, followedId, "follow");
             return true;
         }
 
@@ -59,6 +63,7 @@ public class FollowService {
         Optional<Follow> toDeleteFollow = followRepository.findByFollowedIdAndFollowerId(followedId, followerId);
         if (toDeleteFollow.isPresent()) {
             followRepository.delete(toDeleteFollow.get());
+            notificationService.removeFollowNotification(followerId, followedId, "follow");
             return true;
         } else {
             return false;

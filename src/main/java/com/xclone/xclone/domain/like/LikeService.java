@@ -1,5 +1,7 @@
 package com.xclone.xclone.domain.like;
 import com.xclone.xclone.domain.bookmark.Bookmark;
+import com.xclone.xclone.domain.notification.NewNotification;
+import com.xclone.xclone.domain.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,11 +12,13 @@ import java.util.Optional;
 @Service
 public class LikeService {
 
+    private final NotificationService notificationService;
     private LikeRepository likeRepository;
 
     @Autowired
-    public LikeService(LikeRepository likeRepository) {
+    public LikeService(LikeRepository likeRepository, NotificationService notificationService) {
         this.likeRepository = likeRepository;
+        this.notificationService = notificationService;
     }
 
     public ArrayList<Integer> getAllUserLikes (Integer likerId) {
@@ -36,10 +40,15 @@ public class LikeService {
             return false;
         } else {
             likeRepository.save(like);
+            notificationService.handlePostCreateNotification(likerId, likedPostId, "like");
             return true;
         }
 
     }
+
+
+
+
 
     @Transactional
     public boolean deleteLike(Integer likerId, Integer likedPostId) {
@@ -47,6 +56,7 @@ public class LikeService {
         Optional<Like> toDelete = likeRepository.findByLikerIdAndLikedPostId(likerId, likedPostId);
         if (toDelete.isPresent()) {
             likeRepository.delete(toDelete.get());
+            notificationService.handlePostDeleteNotification(likerId, likedPostId, "like");
             return true;
         } else {
             return false;
