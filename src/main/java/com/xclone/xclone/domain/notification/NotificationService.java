@@ -59,28 +59,11 @@ public class NotificationService {
 
     }
 
-    public boolean markAllAsSeen(ArrayList<Integer> notificationIds) {
-
-        for (int i = 0; i < notificationIds.size(); i++) {
-            markAsSeen(notificationIds.get(i));
-        }
-
-        return true;
-
-    }
-
     @Transactional
-    public boolean markAsSeen (Integer notificationId) {
+    public void markAllReceiverNotificationsAsSeen(Integer receiverId) {
 
-        Optional<Notification> notification = notificationRepository.findById(notificationId);
+        notificationRepository.markAllAsSeen(receiverId);
 
-            if (!notification.isPresent()) return false;
-            if (notification.get().isSeen()) return false;
-
-            notification.get().setSeen(true);
-            notificationRepository.save(notification.get());
-
-            return true;
     }
 
     public boolean checkExistingNotification(NewNotification newNotification) {

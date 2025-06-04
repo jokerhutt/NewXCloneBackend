@@ -25,12 +25,9 @@ public class NotificationController {
     }
 
     @PostMapping("/markAsSeen")
-    public ResponseEntity<?> markAllNotificationsAsSeen(@RequestBody ArrayList<Integer> ids) {
-        if (notificationService.markAllAsSeen(ids)) {
-            return ResponseEntity.ok("SUCCESS");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("NOTSUCCESS");
-        }
+    public ResponseEntity<?> markAllNotificationsAsSeen(@RequestBody Integer id) {
+        notificationService.markAllReceiverNotificationsAsSeen(id);
+        return ResponseEntity.ok("SUCCESS");
     }
 
     @GetMapping("/getAllNotifications/{receiverId}")
