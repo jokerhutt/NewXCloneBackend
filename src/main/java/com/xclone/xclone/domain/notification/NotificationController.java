@@ -36,7 +36,7 @@ public class NotificationController {
     @GetMapping("/getAllNotifications/{receiverId}")
     public ResponseEntity<?> getAllNotificationsForUser(@RequestParam Integer receiverId) {
 
-        NotificationDTO toReturn = notificationService.getUsersNotifications(receiverId);
+        ArrayList<NotificationDTO> toReturn = notificationService.getUsersNotifications(receiverId);
         return ResponseEntity.ok(toReturn);
 
     }

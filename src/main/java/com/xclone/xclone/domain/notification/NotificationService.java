@@ -46,7 +46,7 @@ public class NotificationService {
 
     }
 
-    public NotificationDTO getUsersNotifications (Integer userId) {
+    public ArrayList<NotificationDTO> getUsersNotifications (Integer userId) {
 
         ArrayList<Notification> userNotifications = notificationRepository.findAllByReceiverId(userId);
         ArrayList<NotificationDTO> userNotificationDTOs = new ArrayList<>();
@@ -55,7 +55,7 @@ public class NotificationService {
                 userNotificationDTOs.add(new NotificationDTO(notification));
             }
         }
-        return userNotificationDTOs.get(0);
+        return userNotificationDTOs;
 
     }
 
