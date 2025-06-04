@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.user;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -17,6 +18,8 @@ public class UserDTO {
     public ArrayList<Integer> likedPosts;
     public ArrayList<Integer> followers;
     public ArrayList<Integer> following;
+    public Timestamp createdAt;
+
 
     public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following) {
         this.id = user.getId();
@@ -31,5 +34,7 @@ public class UserDTO {
         this.likedPosts = likedPosts;
         this.followers = followers;
         this.following = following;
+        this.createdAt = user.getCreatedAt();
+
     }
 }
