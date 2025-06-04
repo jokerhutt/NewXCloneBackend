@@ -50,25 +50,29 @@ public class NotificationService {
 
         ArrayList<Notification> userNotifications = notificationRepository.findAllByReceiverId(userId);
         ArrayList<NotificationDTO> userNotificationDTOs = new ArrayList<>();
-        for (Notification notification : userNotifications) {
-            userNotificationDTOs.add(new NotificationDTO(notification));
+        if (userNotifications != null) {
+            for (Notification notification : userNotifications) {
+                userNotificationDTOs.add(new NotificationDTO(notification));
+            }
         }
         return userNotificationDTOs.get(0);
 
     }
 
-    public void markAllAsSeen(ArrayList<NotificationDTO> notificationDTOs) {
+    public boolean markAllAsSeen(ArrayList<Integer> notificationIds) {
 
-        for (int i = 0; i < notificationDTOs.size(); i++) {
-            markAsSeen(notificationDTOs.get(i));
+        for (int i = 0; i < notificationIds.size(); i++) {
+            markAsSeen(notificationIds.get(i));
         }
+
+        return true;
 
     }
 
     @Transactional
-    public boolean markAsSeen (NotificationDTO notificationDTO) {
+    public boolean markAsSeen (Integer notificationId) {
 
-        Optional<Notification> notification = notificationRepository.findById(notificationDTO.id);
+        Optional<Notification> notification = notificationRepository.findById(notificationId);
 
             if (!notification.isPresent()) return false;
             if (notification.get().isSeen()) return false;
