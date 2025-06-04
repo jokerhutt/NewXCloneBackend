@@ -15,4 +15,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     boolean existsBySenderIdAndReceiverIdAndTypeAndPostId(Integer senderId, Integer receiverId, String type, Integer postId);
 
     boolean existsBySenderIdAndReceiverIdAndType(Integer senderId, Integer receiverId, String type);
+
 }

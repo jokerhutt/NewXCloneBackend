@@ -20,7 +20,7 @@ public class Notification {
     @Column(name = "type")
     private String type;
 
-    @Column(name = "postId")
+    @Column(name = "postId", nullable = true)
     private Integer postId;
 
     @Column(name = "seen")
