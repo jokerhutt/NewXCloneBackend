@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
 @Service
 public class NotificationService {
 
@@ -40,6 +43,17 @@ public class NotificationService {
         } else {
             return false;
         }
+
+    }
+
+    public NotificationDTO getUsersNotifications (Integer userId) {
+
+        ArrayList<Notification> userNotifications = notificationRepository.findAllByReceiverId(userId);
+        ArrayList<NotificationDTO> userNotificationDTOs = new ArrayList<>();
+        for (Notification notification : userNotifications) {
+            userNotificationDTOs.add(new NotificationDTO(notification));
+        }
+        return userNotificationDTOs.get(0);
 
     }
 

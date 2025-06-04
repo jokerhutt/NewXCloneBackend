@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public interface NotificationRepository extends JpaRepository<Notification, Integer>{
 
-    Notification findAllByReceiverId(Integer receiverId);
+    ArrayList<Notification> findAllByReceiverId(Integer receiverId);
 
 
     boolean existsBySenderIdAndReceiverIdAndCreatedAt(Integer senderId, Integer receiverId, Timestamp createdAt);
