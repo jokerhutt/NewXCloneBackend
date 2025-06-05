@@ -68,6 +68,7 @@ public class NotificationService {
 
     public void handlePostCreateNotification (Integer senderId, Integer postId, String type) {
         NewNotification toCreate = createNewNotificationTemplateFromPost(senderId, postId, type);
+
         addNotification(toCreate);
     }
 

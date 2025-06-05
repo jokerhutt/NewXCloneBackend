@@ -11,6 +11,7 @@ public class PostDTO {
     public Timestamp createdAt;
     public ArrayList<Integer> likedBy;
     public ArrayList<Integer> bookmarkedBy;
+    public Integer parentId;
 
     public PostDTO(Post post, ArrayList<Integer> likedBy, ArrayList<Integer> bookmarkedBy) {
         this.id = post.getId();
@@ -19,5 +20,6 @@ public class PostDTO {
         this.likedBy = likedBy;
         this.bookmarkedBy = bookmarkedBy;
         this.createdAt = post.getCreatedAt();
+        this.parentId = post.getParentId();
     }
 }

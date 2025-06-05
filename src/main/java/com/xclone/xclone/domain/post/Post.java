@@ -16,6 +16,9 @@ public class Post {
     @Column(name = "user_id")
     private Integer userId;
 
+    @Column(name = "parent_id")
+    private Integer parentId;
+
     @Column(nullable = false, length = 180)
     private String text;
 
@@ -48,5 +51,13 @@ public class Post {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
     }
 }

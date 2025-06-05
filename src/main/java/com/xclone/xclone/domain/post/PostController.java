@@ -24,9 +24,6 @@ public class PostController {
 
     @PostMapping("/createPost")
     public ResponseEntity<?> createPost(@RequestBody NewPost newPost) {
-        System.out.println("Gonna create new post");
-        System.out.println(newPost.text.toString());
-        System.out.println(newPost.text);
 
         PostDTO createdPost = postService.createNewPost(newPost);
         return ResponseEntity.ok(createdPost);
