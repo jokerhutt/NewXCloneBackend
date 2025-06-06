@@ -1,6 +1,7 @@
 package com.xclone.xclone.domain.follow;
 
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.user.UserDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,31 +44,38 @@ public class FollowService {
     }
 
     @Transactional
-    public boolean addNewFollow (Integer followerId, Integer followedId) {
+    public Integer addNewFollow (Integer followerId, Integer followedId) {
         Follow follow = new Follow();
         follow.setFollowerId(followerId);
         follow.setFollowedId(followedId);
+        System.out.println("Trying to ass follow " + followerId + " followed " + followedId);
 
-        if (followRepository.existsByFollowedIdAndFollowerId(followedId, followerId)) {
-            return false;
-        } else {
+        if (!followRepository.existsByFollowedIdAndFollowerId(followedId, followerId)) {
+            System.out.println("Adding follow " + followedId);
             followRepository.save(follow);
             notificationService.addFollowNotification(followerId, followedId, "follow");
-            return true;
+        } else {
+            System.out.println("Follow already exists " + followedId);
         }
+
+        return followedId;
 
     }
 
     @Transactional
-    public boolean deleteFollow(Integer followerId, Integer followedId) {
+    public Integer deleteFollow(Integer followerId, Integer followedId) {
         Optional<Follow> toDeleteFollow = followRepository.findByFollowedIdAndFollowerId(followedId, followerId);
+        System.out.println("Trying to delete follow " + followerId + " followed " + followedId);
         if (toDeleteFollow.isPresent()) {
+            System.out.println("Deleting follow " + followedId);
             followRepository.delete(toDeleteFollow.get());
             notificationService.removeFollowNotification(followerId, followedId, "follow");
-            return true;
         } else {
-            return false;
+            System.out.println("Not found follow");
         }
+
+        return followedId;
+
     }
 
 

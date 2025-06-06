@@ -1,5 +1,7 @@
 package com.xclone.xclone.domain.bookmark;
 
+import com.xclone.xclone.domain.post.PostDTO;
+import com.xclone.xclone.domain.post.PostService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,11 +12,13 @@ import java.util.Optional;
 @Service
 public class BookmarkService {
 
+    private final PostService postService;
     private BookmarkRepository bookmarkRepository;
 
     @Autowired
-    public BookmarkService(BookmarkRepository bookmarkRepository) {
+    public BookmarkService(BookmarkRepository bookmarkRepository, PostService postService) {
         this.bookmarkRepository = bookmarkRepository;
+        this.postService = postService;
     }
 
     public ArrayList<Integer> getAllUserBookmarks (Integer userId) {
@@ -27,30 +31,28 @@ public class BookmarkService {
     }
 
     @Transactional
-    public boolean addNewBookmark(Integer userId, Integer bookmarkedPost) {
+    public PostDTO addNewBookmark(Integer userId, Integer bookmarkedPost) {
         Bookmark bookmark = new Bookmark();
         bookmark.setBookmarkedBy(userId);
         bookmark.setBookmarkedPost(bookmarkedPost);
 
-        if (bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost)) {
-            return false;
-        } else {
+        if (!bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost)) {
             bookmarkRepository.save(bookmark);
-            return true;
         }
+
+        return postService.findPostDTOById(bookmarkedPost);
 
     }
 
     @Transactional
-    public boolean deleteBookmark(Integer userId, Integer bookmarkedPost) {
+    public PostDTO deleteBookmark(Integer userId, Integer bookmarkedPost) {
 
         Optional<Bookmark> toDelete = bookmarkRepository.findByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost);
         if (toDelete.isPresent()) {
             bookmarkRepository.delete(toDelete.get());
-            return true;
-        } else {
-            return false;
         }
+
+        return postService.findPostDTOById(bookmarkedPost);
 
     }
 

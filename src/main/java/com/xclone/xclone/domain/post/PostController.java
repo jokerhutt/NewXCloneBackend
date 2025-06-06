@@ -36,6 +36,11 @@ public class PostController {
 
     }
 
+    @GetMapping("/getSinglePost/{id}")
+    public ResponseEntity<?> getSinglePost(@PathVariable Integer id) {
+        return ResponseEntity.ok(postService.findPostDTOById(id));
+    }
+
     @GetMapping("/getAllPostIds")
     public ResponseEntity<?> getAllPostIds() {
         return ResponseEntity.ok(postService.findAllPostIds());

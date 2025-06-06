@@ -17,22 +17,15 @@ public class LikeController {
     @PostMapping("/createLike")
     public ResponseEntity<?> createLike(@RequestBody NewLike newLike) {
 
-        if (likeService.addNewLike(newLike.getLikerId(), newLike.getLikedPostId())) {
-            return ResponseEntity.ok("SUCCESS");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("NOTSUCCESS");
-        }
+        return ResponseEntity.ok(likeService.addNewLike(newLike.getLikerId(), newLike.getLikedPostId()));
 
     }
 
     @PostMapping("/deleteLike")
     public ResponseEntity<?> removeLike(@RequestBody NewLike newLike) {
 
-        if (likeService.deleteLike(newLike.getLikerId(), newLike.getLikedPostId())) {
-            return ResponseEntity.ok("SUCCESS");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("NOTSUCCESS");
-        }
+        return ResponseEntity.ok(likeService.deleteLike(newLike.getLikerId(), newLike.getLikedPostId()));
+
 
     }
 
