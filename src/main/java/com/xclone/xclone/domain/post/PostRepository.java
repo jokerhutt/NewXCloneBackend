@@ -11,4 +11,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Optional<Post> findById(int id);
     Optional<Post> findByUserId(int id);
     Optional<List<Post>> findAllByUserId(int id);
+    ArrayList<Post> findAllByParentId(Integer id);
 }

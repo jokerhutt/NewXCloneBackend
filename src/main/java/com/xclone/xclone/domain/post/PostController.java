@@ -26,7 +26,14 @@ public class PostController {
     public ResponseEntity<?> createPost(@RequestBody NewPost newPost) {
 
         PostDTO createdPost = postService.createNewPost(newPost);
-        return ResponseEntity.ok(createdPost);
+        PostDTO parentPost = null;
+        if (newPost.parentId != null) {
+            parentPost = postService.findPostDTOById(newPost.parentId);
+        }
+        ArrayList<PostDTO> postsToReturn = new ArrayList<>();
+        postsToReturn.add(createdPost);
+        postsToReturn.add(parentPost);
+        return ResponseEntity.ok(postsToReturn);
 
     }
 
