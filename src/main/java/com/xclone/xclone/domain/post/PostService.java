@@ -104,7 +104,7 @@ public class PostService {
 
         if (posts.isPresent()) {
             for (Post post : posts.get()) {
-                if (post.getParentId() == null) { // Filter out replies
+                if (post.getParentId() == null) {
                     ids.add(post.getId());
                 }
             }
@@ -123,12 +123,14 @@ public class PostService {
         return ids;
     }
 
-    public ArrayList<Integer> findAllPostsAndRepliesByUserId(int id) {
+    public ArrayList<Integer> findAllRepliesByUserId(int id) {
         Optional<List<Post>> posts = postRepository.findAllByUserId(id);
         ArrayList<Integer> ids = new ArrayList<>();
         if (posts.isPresent()) {
             for (Post post : posts.get()) {
-                ids.add(post.getId());
+                if (post.getParentId() != null) {
+                    ids.add(post.getId());
+                }
             }
         }
 

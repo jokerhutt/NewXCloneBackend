@@ -19,10 +19,10 @@ public class UserDTO {
     public ArrayList<Integer> followers;
     public ArrayList<Integer> following;
     public Timestamp createdAt;
-    public ArrayList<Integer> postsAndReplies;
+    public ArrayList<Integer> replies;
 
 
-    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following, ArrayList<Integer> postsAndReplies) {
+    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following, ArrayList<Integer> replies) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
@@ -36,7 +36,7 @@ public class UserDTO {
         this.followers = followers;
         this.following = following;
         this.createdAt = user.getCreatedAt();
-        this.postsAndReplies = postsAndReplies;
+        this.replies = replies;
 
     }
 }

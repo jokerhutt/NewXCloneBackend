@@ -47,13 +47,13 @@ public class UserService {
 
         Optional<User> user = this.findById(id);
         ArrayList<Integer> userPosts = postService.findAllPostsByUserId(id);
-        ArrayList<Integer> userPostsAndReplies = postService.findAllPostsAndRepliesByUserId(id);
+        ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(id);
         ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(id);
         ArrayList<Integer> userLikes = likeService.getAllUserLikes(id);
         ArrayList<Integer> userFollowing = followService.getAllUserFollowing(id);
         ArrayList<Integer> userFollowers = followService.getAllUserFollowers(id);
         if (user.isPresent()) {
-            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userPostsAndReplies);
+            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies);
         } else {
             return null;
         }
@@ -70,8 +70,8 @@ public class UserService {
             ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
             ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
             ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
-            ArrayList<Integer> userPostsAndReplies = postService.findAllPostsAndRepliesByUserId(user.getId());
-            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userPostsAndReplies));
+            ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(user.getId());
+            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies));
         });
         return userDTOs;
     }
