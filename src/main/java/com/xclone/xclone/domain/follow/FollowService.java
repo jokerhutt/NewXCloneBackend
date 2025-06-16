@@ -53,7 +53,7 @@ public class FollowService {
         if (!followRepository.existsByFollowedIdAndFollowerId(followedId, followerId)) {
             System.out.println("Adding follow " + followedId);
             followRepository.save(follow);
-            notificationService.addFollowNotification(followerId, followedId, "follow");
+            notificationService.createNotificationFromType(followerId, followedId, "follow");
         } else {
             System.out.println("Follow already exists " + followedId);
         }
@@ -69,7 +69,7 @@ public class FollowService {
         if (toDeleteFollow.isPresent()) {
             System.out.println("Deleting follow " + followedId);
             followRepository.delete(toDeleteFollow.get());
-            notificationService.removeFollowNotification(followerId, followedId, "follow");
+            notificationService.deleteNotificationFromType(followerId, followedId, "follow");
         } else {
             System.out.println("Not found follow");
         }

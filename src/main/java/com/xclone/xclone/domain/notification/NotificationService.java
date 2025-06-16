@@ -135,18 +135,6 @@ public class NotificationService {
         }
     }
 
-    public void addFollowNotification(Integer followerId, Integer followingId, String type) {
-        NewNotification newNotification = createFollowNotificationTemplate(followerId, followingId, type);
-        addNotification(newNotification);
-    }
-
-    public void removeFollowNotification(Integer followerId, Integer followingId, String type) {
-        Notification notification = getFollowNotification(followerId, followingId, type);
-        if (notification != null) {
-            deleteNotification(notification);
-        }
-    }
-
     public NewNotification createNewNotificationTemplateFromPost(Integer senderId, Integer postId, String type) {
         NewNotification newNotification = new NewNotification();
         newNotification.senderId = senderId;
