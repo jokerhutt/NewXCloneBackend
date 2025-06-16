@@ -25,21 +25,6 @@ public class PostController {
         this.notificationService = notificationService;
     }
 
-    @PostMapping("/createPostOld")
-    public ResponseEntity<?> createPost(@RequestBody NewPost newPost) {
-
-        PostDTO createdPost = postService.createNewPost(newPost);
-        PostDTO parentPost = null;
-        if (newPost.parentId != null) {
-            parentPost = postService.findPostDTOById(newPost.parentId);
-        }
-        ArrayList<PostDTO> postsToReturn = new ArrayList<>();
-        postsToReturn.add(createdPost);
-        postsToReturn.add(parentPost);
-        return ResponseEntity.ok(postsToReturn);
-
-    }
-
     @PostMapping("/getPosts")
     public ResponseEntity<?> getPost(@RequestBody ArrayList<Integer> ids) {
         System.out.println("Received request to retrieve posts");
@@ -60,14 +45,9 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
 
-        String base64 = Base64.getEncoder().encodeToString(media.getData());
+        Map encodedPostMedia = postService.preparePostMediaMapToBase64(media);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("src", "data:" + media.getMimeType() + ";base64," + base64);
-        response.put("alt", media.getFileName());
-        response.put("type", media.getMimeType());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(encodedPostMedia);
     }
 
     @GetMapping("/getSinglePost/{id}")

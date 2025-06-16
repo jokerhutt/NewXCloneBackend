@@ -20,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PostService {
@@ -93,6 +91,18 @@ public class PostService {
             return postMedia;
         }
 
+    }
+
+    public Map preparePostMediaMapToBase64 (PostMedia postMedia) {
+
+        String base64 = Base64.getEncoder().encodeToString(postMedia.getData());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("src", "data:" + postMedia.getMimeType() + ";base64," + base64);
+        response.put("alt", postMedia.getFileName());
+        response.put("type", postMedia.getMimeType());
+
+        return response;
     }
 
     public List<PostMedia> getAllPostMediaByPostId(ArrayList<Integer> ids) {
