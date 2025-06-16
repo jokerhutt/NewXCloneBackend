@@ -11,9 +11,14 @@ import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +32,16 @@ public class PostService {
     private final BookmarkRepository bookmarkRepository;
     private final NotificationService notificationService;
     private final RetweetService retweetService;
+    private final PostMediaRepository postMediaRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetService retweetService) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetService retweetService, PostMediaRepository postMediaRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.notificationService = notificationService;
         this.retweetService = retweetService;
+        this.postMediaRepository = postMediaRepository;
     }
 
     public PostDTO findPostDTOById(int id) {
@@ -48,6 +55,9 @@ public class PostService {
         ArrayList<Integer> repliesIds = new ArrayList<>();
 
         ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(id);
+        ArrayList<Integer> postMediaIds = new ArrayList<>();
+
+        ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(id);
 
         for (Like like : likedBy) {
             likedByIds.add(like.getLikerId());
@@ -61,11 +71,32 @@ public class PostService {
             repliesIds.add(reply.getId());
         }
 
+        if (postMedia != null) {
+            for (PostMedia postM: postMedia) {
+                postMediaIds.add(postM.getId());
+            }
+        }
+
         if (post.isPresent()) {
-            return new PostDTO(post.get(), likedByIds, bookmarkIds, repliesIds, retweeters);
+            return new PostDTO(post.get(), likedByIds, bookmarkIds, repliesIds, retweeters, postMediaIds);
         } else {
             return null;
         }
+    }
+
+    public PostMedia getPostMediaById(int id) {
+        PostMedia postMedia = postMediaRepository.findById(id).orElse(null);
+        if (postMedia == null) {
+            return null;
+        } else {
+            System.out.println("FILE NAME IS: " + postMedia.getFileName() + "DATA: " + postMedia.getData());
+            return postMedia;
+        }
+
+    }
+
+    public List<PostMedia> getAllPostMediaByPostId(ArrayList<Integer> ids) {
+        return postMediaRepository.findAllByPostIdIn(ids);
     }
 
     public Optional<Post> findByUserId(int id) {
@@ -87,6 +118,8 @@ public class PostService {
             ArrayList<Integer> repliesIds = new ArrayList<>();
 
             ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(post.getId());
+            ArrayList<Integer> postMediaIds = new ArrayList<>();
+            ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
 
             for (Like like : likedBy) {
                 likedByIds.add(like.getLikerId());
@@ -100,7 +133,13 @@ public class PostService {
                 repliesIds.add(reply.getId());
             }
 
-            postDTOs.add(new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters));
+            if (postMedia != null) {
+                for (PostMedia postM: postMedia) {
+                    postMediaIds.add(postM.getId());
+                }
+            }
+
+            postDTOs.add(new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMediaIds));
         }
 
         return postDTOs;
@@ -169,6 +208,32 @@ public class PostService {
 
         return this.findPostDTOById(post.getId());
 
+    }
+
+    public Post createPostEntity(Integer userId, String text, Integer parentId) {
+        Post post = new Post();
+        post.setUserId(userId);
+        post.setText(text);
+        if (parentId != null) {
+            post.setParentId(parentId);
+        }
+
+        return postRepository.save(post);
+    }
+
+    public void savePostImages(Integer postId, List<MultipartFile> images) {
+        for (MultipartFile image : images) {
+            try {
+                byte[] data = image.getBytes();
+                String fileName = image.getOriginalFilename();
+                String mimeType = image.getContentType();
+
+                PostMedia media = new PostMedia(postId, fileName, mimeType, data);
+                postMediaRepository.save(media);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to process image: " + image.getOriginalFilename());
+            }
+        }
     }
 
 }
