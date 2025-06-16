@@ -31,28 +31,32 @@ public class BookmarkService {
     }
 
     @Transactional
-    public PostDTO addNewBookmark(Integer userId, Integer bookmarkedPost) {
+    public boolean addNewBookmark(Integer userId, Integer bookmarkedPost) {
+
+        if (bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost)) {
+            throw new IllegalStateException("Bookmark exists");
+        }
+
         Bookmark bookmark = new Bookmark();
         bookmark.setBookmarkedBy(userId);
         bookmark.setBookmarkedPost(bookmarkedPost);
 
-        if (!bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost)) {
-            bookmarkRepository.save(bookmark);
-        }
+        bookmarkRepository.save(bookmark);
 
-        return postService.findPostDTOById(bookmarkedPost);
+        return true;
 
     }
 
     @Transactional
-    public PostDTO deleteBookmark(Integer userId, Integer bookmarkedPost) {
+    public boolean deleteBookmark(Integer userId, Integer bookmarkedPost) {
 
         Optional<Bookmark> toDelete = bookmarkRepository.findByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost);
         if (toDelete.isPresent()) {
             bookmarkRepository.delete(toDelete.get());
+            return true;
+        } else {
+            throw new IllegalStateException("Bookmark does not exist");
         }
-
-        return postService.findPostDTOById(bookmarkedPost);
 
     }
 

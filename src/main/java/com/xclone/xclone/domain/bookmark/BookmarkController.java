@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/bookmarks")
 public class BookmarkController {
@@ -19,8 +21,12 @@ public class BookmarkController {
 
     @PostMapping("/createBookmark")
     public ResponseEntity<?> createBookmark(@RequestBody NewBookmark newBookmark) {
-
-        return ResponseEntity.ok(bookmarkService.addNewBookmark(newBookmark.getBookmarkedBy(), newBookmark.getBookmarkedPost()));
+        try {
+            bookmarkService.addNewBookmark(newBookmark.getBookmarkedBy(), newBookmark.getBookmarkedPost());
+            return ResponseEntity.ok(Map.of("message", "Bookmark created"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        }
 
     }
 
