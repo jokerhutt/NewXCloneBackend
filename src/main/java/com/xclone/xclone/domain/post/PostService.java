@@ -44,42 +44,14 @@ public class PostService {
 
     public PostDTO findPostDTOById(int id) {
         Optional<Post> post = postRepository.findById(id);
-        ArrayList<Like> likedBy = likeRepository.findAllByLikedPostId(post.get().getId());
-        ArrayList<Integer> likedByIds = new ArrayList<>();
-
-        ArrayList<Bookmark> bookmarks = bookmarkRepository.findAllByBookmarkedPost(post.get().getId());
-        ArrayList<Integer> bookmarkIds = new ArrayList<>();
-        ArrayList<Post> replies = postRepository.findAllByParentId(id);
-        ArrayList<Integer> repliesIds = new ArrayList<>();
-
-        ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(id);
-        ArrayList<Integer> postMediaIds = new ArrayList<>();
-
-        ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(id);
-
-        for (Like like : likedBy) {
-            likedByIds.add(like.getLikerId());
-        }
-
-        for (Bookmark bookmark : bookmarks) {
-            bookmarkIds.add(bookmark.getBookmarkedBy());
-        }
-
-        for (Post reply: replies) {
-            repliesIds.add(reply.getId());
-        }
-
-        if (postMedia != null) {
-            for (PostMedia postM: postMedia) {
-                postMediaIds.add(postM.getId());
-            }
-        }
 
         if (post.isPresent()) {
-            return new PostDTO(post.get(), likedByIds, bookmarkIds, repliesIds, retweeters, postMediaIds);
+            Post postEntity = post.get();
+            return createPostDTO(postEntity);
         } else {
             return null;
         }
+
     }
 
     public PostMedia getPostMediaById(int id) {
@@ -118,41 +90,45 @@ public class PostService {
         List<Post> posts = postRepository.findAllById(ids);
 
         for (Post post : posts) {
-            ArrayList<Like> likedBy = likeRepository.findAllByLikedPostId(post.getId());
-            ArrayList<Integer> likedByIds = new ArrayList<>();
-
-            ArrayList<Bookmark> bookmarks = bookmarkRepository.findAllByBookmarkedPost(post.getId());
-            ArrayList<Integer> bookmarkIds = new ArrayList<>();
-
-            ArrayList<Post> replies = postRepository.findAllByParentId(post.getId());
-            ArrayList<Integer> repliesIds = new ArrayList<>();
-
-            ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(post.getId());
-            ArrayList<Integer> postMediaIds = new ArrayList<>();
-            ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
-
-            for (Like like : likedBy) {
-                likedByIds.add(like.getLikerId());
-            }
-
-            for (Bookmark bookmark : bookmarks) {
-                bookmarkIds.add(bookmark.getBookmarkedBy());
-            }
-
-            for (Post reply: replies) {
-                repliesIds.add(reply.getId());
-            }
-
-            if (postMedia != null) {
-                for (PostMedia postM: postMedia) {
-                    postMediaIds.add(postM.getId());
-                }
-            }
-
-            postDTOs.add(new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMediaIds));
+            postDTOs.add(createPostDTO(post));
         }
 
         return postDTOs;
+    }
+
+    private PostDTO createPostDTO(Post post) {
+        ArrayList<Like> likedBy = likeRepository.findAllByLikedPostId(post.getId());
+        ArrayList<Integer> likedByIds = new ArrayList<>();
+
+        ArrayList<Bookmark> bookmarks = bookmarkRepository.findAllByBookmarkedPost(post.getId());
+        ArrayList<Integer> bookmarkIds = new ArrayList<>();
+
+        ArrayList<Post> replies = postRepository.findAllByParentId(post.getId());
+        ArrayList<Integer> repliesIds = new ArrayList<>();
+
+        ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(post.getId());
+        ArrayList<Integer> postMediaIds = new ArrayList<>();
+        ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
+
+        for (Like like : likedBy) {
+            likedByIds.add(like.getLikerId());
+        }
+
+        for (Bookmark bookmark : bookmarks) {
+            bookmarkIds.add(bookmark.getBookmarkedBy());
+        }
+
+        for (Post reply: replies) {
+            repliesIds.add(reply.getId());
+        }
+
+        if (postMedia != null) {
+            for (PostMedia postM: postMedia) {
+                postMediaIds.add(postM.getId());
+            }
+        }
+
+        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMediaIds);
     }
 
     public ArrayList<Integer> findAllPostsByUserId(int id) {
