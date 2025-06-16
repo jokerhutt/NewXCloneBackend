@@ -56,6 +56,29 @@ public class NotificationService {
 
     }
 
+
+
+    @Transactional
+    public NewNotification createReplyNotificationTemplate(Integer senderId, Integer replyPostId) {
+        Optional<Post> reply = postRepository.findById(replyPostId);
+        if (!reply.isPresent()) return null;
+
+        Integer parentPostId = reply.get().getParentId(); // should be non-null for replies
+        if (parentPostId == null) return null;
+
+        Optional<Post> parentPost = postRepository.findById(parentPostId);
+        if (!parentPost.isPresent()) return null;
+
+        NewNotification newNotification = new NewNotification();
+        newNotification.senderId = senderId;
+        newNotification.receiverId = parentPost.get().getUserId(); // parent post's author
+        newNotification.referenceId = reply.get().getId(); // point to the reply post
+        newNotification.text = reply.get().getText();
+        newNotification.type = "reply";
+
+        return newNotification;
+    }
+
     @Transactional
     public boolean deleteNotification(Notification toDelete) {
         if (notificationRepository.existsById(toDelete.getId())) {
@@ -66,10 +89,18 @@ public class NotificationService {
 
 
 
-    public void handlePostCreateNotification (Integer senderId, Integer postId, String type) {
-        NewNotification toCreate = createNewNotificationTemplateFromPost(senderId, postId, type);
+    public void handlePostCreateNotification(Integer senderId, Integer postId, String type) {
+        NewNotification toCreate;
 
-        addNotification(toCreate);
+        if (type.equals("reply")) {
+            toCreate = createReplyNotificationTemplate(senderId, postId);
+        } else {
+            toCreate = createNewNotificationTemplateFromPost(senderId, postId, type);
+        }
+
+        if (toCreate != null) {
+            addNotification(toCreate);
+        }
     }
 
     public void handlePostDeleteNotification (Integer senderId, Integer postId, String type) {

@@ -77,13 +77,7 @@ public class PostController {
             notificationService.handlePostCreateNotification(userId, post.getId(), "reply");
         }
 
-        List<PostDTO> postsToReturn = new ArrayList<>();
-        postsToReturn.add(postService.findPostDTOById(post.getId()));
-        if (parentId != null) {
-            postsToReturn.add(postService.findPostDTOById(parentId));
-        }
-
-        return ResponseEntity.ok(postsToReturn);
+        return ResponseEntity.ok(Map.of("message", "Post created successfully"));
     }
 
 }
