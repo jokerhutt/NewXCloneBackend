@@ -119,8 +119,19 @@ public class UserService {
         }
     }
 
+    private void checkIfUserExistsOnSignup(String email, String username) {
+        if (userRepository.existsUserByEmail(email)) {
+            throw new IllegalStateException("Email already in use");
+        }
+        if (userRepository.existsUserByUsername(username)) {
+            throw new IllegalStateException("Username already in use");
+        }
+    }
+
     @Transactional
     public UserDTO registerUser (User signupUser) {
+
+        checkIfUserExistsOnSignup(signupUser.getEmail(), signupUser.getUsername());
 
         User user = new User();
         user.setUsername(signupUser.getUsername());
