@@ -52,6 +52,9 @@ public class RetweetService {
             retweet.setRetweeterId(newRetweet.retweeterId);
             retweet.setReferenceId(newRetweet.referenceId);
             retweet.setType(newRetweet.type);
+
+            notificationService.handlePostCreateNotification(newRetweet.retweeterId, newRetweet.referenceId, "repost");
+
             retweetRepository.save(retweet);
         }
     }
@@ -61,6 +64,7 @@ public class RetweetService {
         System.out.println("Received delete request");
         Retweet toDelete = retweetRepository.findByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId);
         if (toDelete != null) {
+            notificationService.handlePostDeleteNotification(newRetweet.retweeterId, newRetweet.referenceId, "repost");
             retweetRepository.delete(toDelete);
         }
 
