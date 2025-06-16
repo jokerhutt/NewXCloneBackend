@@ -87,6 +87,31 @@ public class NotificationService {
         return true;
     }
 
+    public void createNotificationFromType(Integer senderId, Integer referenceId, String type) {
+        NewNotification toCreate = new NewNotification();
+        switch (type) {
+            case "reply" -> toCreate = createReplyNotificationTemplate(senderId, referenceId);
+            case "follow" -> toCreate = createFollowNotificationTemplate(senderId, referenceId, type);
+            default -> toCreate = createNewNotificationTemplateFromPost(senderId, referenceId, type);
+        }
+        addNotification(toCreate);
+    }
+
+    public void deleteNotificationFromType(Integer senderId, Integer referenceId, String type) {
+
+        Notification notification;
+
+        switch (type) {
+            case "follow" -> notification = getFollowNotification(senderId, referenceId, type);
+            default -> notification = getNotificationFromSenderAndPost(senderId, referenceId, type);
+        }
+
+        if (notification != null) {
+            notificationRepository.delete(notification);
+        }
+
+    }
+
 
 
     public void handlePostCreateNotification(Integer senderId, Integer postId, String type) {
