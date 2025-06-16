@@ -74,7 +74,7 @@ public class PostController {
         }
 
         if (parentId != null) {
-            notificationService.handlePostCreateNotification(userId, post.getId(), "reply");
+            notificationService.createNotificationFromType(userId, post.getId(), "reply");
         }
 
         return ResponseEntity.ok(Map.of("message", "Post created successfully"));

@@ -176,26 +176,6 @@ public class PostService {
         return ids;
     }
 
-    @Transactional
-    public PostDTO createNewPost(NewPost newPost) {
-
-        Post post = new Post();
-        post.setUserId(newPost.userId);
-        post.setText(newPost.text);
-        if (newPost.parentId != null) {
-            post.setParentId(newPost.parentId);
-        }
-
-        postRepository.save(post);
-
-        if (post.getParentId() != null) {
-            notificationService.handlePostCreateNotification(post.getUserId(), post.getId(), "reply");
-        }
-
-        return this.findPostDTOById(post.getId());
-
-    }
-
     public Post createPostEntity(Integer userId, String text, Integer parentId) {
         Post post = new Post();
         post.setUserId(userId);
