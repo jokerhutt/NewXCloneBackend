@@ -4,6 +4,10 @@ import com.xclone.xclone.domain.notification.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +22,13 @@ public class PostController {
     private static final Logger log = LoggerFactory.getLogger(PostController.class);
     private final PostService postService;
     private final NotificationService notificationService;
+    private final PostRepository postRepository;
 
     @Autowired
-    public PostController(PostService postService, NotificationService notificationService) {
+    public PostController(PostService postService, NotificationService notificationService, PostRepository postRepository) {
         this.postService = postService;
         this.notificationService = notificationService;
+        this.postRepository = postRepository;
     }
 
     @PostMapping("/getPosts")
@@ -48,6 +54,17 @@ public class PostController {
         Map encodedPostMedia = postService.preparePostMediaMapToBase64(media);
 
         return ResponseEntity.ok(encodedPostMedia);
+    }
+
+    @GetMapping("/getForYouFeed")
+    public ResponseEntity<?> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Integer> postPage = postRepository.findAllPostIds(pageable);
+        List<Integer> ids = postPage.getContent();
+        return ResponseEntity.ok(ids);
     }
 
     @GetMapping("/getSinglePost/{id}")
