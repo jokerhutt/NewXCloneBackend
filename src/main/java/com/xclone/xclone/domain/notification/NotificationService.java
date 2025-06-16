@@ -88,7 +88,7 @@ public class NotificationService {
     }
 
     public void createNotificationFromType(Integer senderId, Integer referenceId, String type) {
-        NewNotification toCreate = new NewNotification();
+        NewNotification toCreate;
         switch (type) {
             case "reply" -> toCreate = createReplyNotificationTemplate(senderId, referenceId);
             case "follow" -> toCreate = createFollowNotificationTemplate(senderId, referenceId, type);
@@ -110,29 +110,6 @@ public class NotificationService {
             notificationRepository.delete(notification);
         }
 
-    }
-
-
-
-    public void handlePostCreateNotification(Integer senderId, Integer postId, String type) {
-        NewNotification toCreate;
-
-        if (type.equals("reply")) {
-            toCreate = createReplyNotificationTemplate(senderId, postId);
-        } else {
-            toCreate = createNewNotificationTemplateFromPost(senderId, postId, type);
-        }
-
-        if (toCreate != null) {
-            addNotification(toCreate);
-        }
-    }
-
-    public void handlePostDeleteNotification (Integer senderId, Integer postId, String type) {
-        Notification notification = getNotificationFromSenderAndPost(senderId, postId, type);
-        if (notification != null) {
-            deleteNotification(notification);
-        }
     }
 
     public NewNotification createNewNotificationTemplateFromPost(Integer senderId, Integer postId, String type) {

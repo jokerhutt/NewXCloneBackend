@@ -45,7 +45,7 @@ public class LikeService {
         like.setLikedPostId(likedPostId);
         like.setLikerId(likerId);
         likeRepository.save(like);
-        notificationService.handlePostCreateNotification(likerId, likedPostId, "like");
+        notificationService.createNotificationFromType(likerId, likedPostId, "like");
 
         return true;
 
@@ -59,7 +59,7 @@ public class LikeService {
         Optional<Like> toDelete = likeRepository.findByLikerIdAndLikedPostId(likerId, likedPostId);
         if (toDelete.isPresent()) {
             likeRepository.delete(toDelete.get());
-            notificationService.handlePostDeleteNotification(likerId, likedPostId, "like");
+            notificationService.deleteNotificationFromType(likerId, likedPostId, "like");
             return true;
         } else {
             throw new IllegalStateException("Like does not exist");
