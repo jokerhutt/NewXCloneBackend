@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/follows")
 public class FollowController {
@@ -21,31 +23,22 @@ public class FollowController {
 
     @PostMapping("/followUser")
     public ResponseEntity<?> createFollow (@RequestBody NewFollow newFollow) {
-        UserDTO firstDTO = userService.findUserByID(newFollow.followerId);
-        if (firstDTO != null) {
-            System.out.println("<FIRST> UserDTO followers: " + firstDTO.followers);
+        try {
+            followService.addNewFollow(newFollow.followerId, newFollow.followedId);
+            return ResponseEntity.ok(Map.of("message", "Like created"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
-        Integer addedFollowId = followService.addNewFollow(newFollow.followerId, newFollow.followedId);
-        UserDTO newFollowedUser = userService.findUserByID(addedFollowId);
-        if (newFollowedUser != null) {
-            System.out.println("📦 UserDTO followers: " + newFollowedUser.followers);
-        }
-        return ResponseEntity.ok(newFollowedUser);
-
     }
 
     @PostMapping("/unfollowUser")
     public ResponseEntity<?> unfollowUser (@RequestBody NewFollow newFollow) {
-        UserDTO firstDTO = userService.findUserByID(newFollow.followerId);
-        if (firstDTO != null) {
-            System.out.println("<FIRST> UserDTO followers: " + firstDTO.followers);
+        try {
+            followService.deleteFollow(newFollow.followerId, newFollow.followedId);
+            return ResponseEntity.ok(Map.of("message", "Follow removed"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
-        Integer removedFollowId = followService.deleteFollow(newFollow.followerId, newFollow.followedId);
-        UserDTO removedFollowedUser = userService.findUserByID(removedFollowId);
-        if (removedFollowedUser != null) {
-            System.out.println("📦 UserDTO followers: " + removedFollowedUser.followers);
-        }
-        return ResponseEntity.ok(removedFollowedUser);
     }
 
 

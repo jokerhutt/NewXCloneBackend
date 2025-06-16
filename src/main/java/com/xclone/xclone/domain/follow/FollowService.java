@@ -44,38 +44,34 @@ public class FollowService {
     }
 
     @Transactional
-    public Integer addNewFollow (Integer followerId, Integer followedId) {
+    public boolean addNewFollow (Integer followerId, Integer followedId) {
+
+        if (followRepository.existsByFollowedIdAndFollowerId(followedId, followerId)) {
+            throw new IllegalStateException("Follow exists");
+        }
+
         Follow follow = new Follow();
         follow.setFollowerId(followerId);
         follow.setFollowedId(followedId);
-        System.out.println("Trying to ass follow " + followerId + " followed " + followedId);
 
-        if (!followRepository.existsByFollowedIdAndFollowerId(followedId, followerId)) {
-            System.out.println("Adding follow " + followedId);
-            followRepository.save(follow);
-            notificationService.createNotificationFromType(followerId, followedId, "follow");
-        } else {
-            System.out.println("Follow already exists " + followedId);
-        }
+        followRepository.save(follow);
+        notificationService.createNotificationFromType(followerId, followedId, "follow");
 
-        return followedId;
+        return true;
+
 
     }
 
     @Transactional
-    public Integer deleteFollow(Integer followerId, Integer followedId) {
+    public boolean deleteFollow(Integer followerId, Integer followedId) {
         Optional<Follow> toDeleteFollow = followRepository.findByFollowedIdAndFollowerId(followedId, followerId);
-        System.out.println("Trying to delete follow " + followerId + " followed " + followedId);
         if (toDeleteFollow.isPresent()) {
-            System.out.println("Deleting follow " + followedId);
             followRepository.delete(toDeleteFollow.get());
             notificationService.deleteNotificationFromType(followerId, followedId, "follow");
+            return true;
         } else {
-            System.out.println("Not found follow");
+            throw new IllegalStateException("Follow does not exist");
         }
-
-        return followedId;
-
     }
 
 
