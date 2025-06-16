@@ -6,6 +6,7 @@ import com.xclone.xclone.domain.like.LikeService;
 import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.post.PostService;
+import com.xclone.xclone.domain.retweet.RetweetService;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -31,14 +32,16 @@ public class UserService {
     private final BookmarkService bookmarkService;
     private final LikeService likeService;
     private final FollowService followService;
+    private final RetweetService retweetService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, FollowService followService) {
+    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, FollowService followService, RetweetService retweetService) {
         this.userRepository = userRepository;
         this.postService = postService;
         this.bookmarkService = bookmarkService;
         this.likeService = likeService;
         this.followService = followService;
+        this.retweetService = retweetService;
     }
 
 
@@ -52,8 +55,10 @@ public class UserService {
         ArrayList<Integer> userLikes = likeService.getAllUserLikes(id);
         ArrayList<Integer> userFollowing = followService.getAllUserFollowing(id);
         ArrayList<Integer> userFollowers = followService.getAllUserFollowers(id);
+        ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(id);
+
         if (user.isPresent()) {
-            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies);
+            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies, userRetweets);
         } else {
             return null;
         }
@@ -61,6 +66,31 @@ public class UserService {
 
 
     }
+
+    public String getUserProfileMedia (Integer userId, String type) {
+
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+
+            if (type.equals("profilePic")) {
+                String profilePic = Base64.getEncoder().encodeToString(user.get().getProfilePicture());
+                return profilePic;
+            }
+
+            if (type.equals("bannerImage")) {
+                String bannerImage = Base64.getEncoder().encodeToString(user.get().getBannerImage());
+                return bannerImage;
+            }
+
+        }
+
+        return null;
+
+    }
+
+
+//            this.profilePicture = Base64.getEncoder().encodeToString(user.getProfilePicture());
+//        this.bannerImage = Base64.getEncoder().encodeToString(user.getBannerImage());
 
     public ArrayList<UserDTO> findAllUserDTOByIds( ArrayList<Integer> ids) {
         ArrayList<UserDTO> userDTOs = new ArrayList<>();
@@ -71,7 +101,8 @@ public class UserService {
             ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
             ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
             ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(user.getId());
-            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies));
+            ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(user.getId());
+            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies, userRetweets));
         });
         return userDTOs;
     }

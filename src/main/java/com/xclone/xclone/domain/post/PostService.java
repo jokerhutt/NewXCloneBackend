@@ -5,6 +5,8 @@ import com.xclone.xclone.domain.bookmark.BookmarkRepository;
 import com.xclone.xclone.domain.like.Like;
 import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.retweet.Retweet;
+import com.xclone.xclone.domain.retweet.RetweetService;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserRepository;
@@ -24,13 +26,15 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final NotificationService notificationService;
+    private final RetweetService retweetService;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetService retweetService) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.notificationService = notificationService;
+        this.retweetService = retweetService;
     }
 
     public PostDTO findPostDTOById(int id) {
@@ -43,12 +47,14 @@ public class PostService {
         ArrayList<Post> replies = postRepository.findAllByParentId(id);
         ArrayList<Integer> repliesIds = new ArrayList<>();
 
+        ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(id);
+
         for (Like like : likedBy) {
             likedByIds.add(like.getLikerId());
         }
 
         for (Bookmark bookmark : bookmarks) {
-            bookmarkIds.add(bookmark.getId());
+            bookmarkIds.add(bookmark.getBookmarkedBy());
         }
 
         for (Post reply: replies) {
@@ -56,7 +62,7 @@ public class PostService {
         }
 
         if (post.isPresent()) {
-            return new PostDTO(post.get(), likedByIds, bookmarkIds, repliesIds);
+            return new PostDTO(post.get(), likedByIds, bookmarkIds, repliesIds, retweeters);
         } else {
             return null;
         }
@@ -80,19 +86,21 @@ public class PostService {
             ArrayList<Post> replies = postRepository.findAllByParentId(post.getId());
             ArrayList<Integer> repliesIds = new ArrayList<>();
 
+            ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(post.getId());
+
             for (Like like : likedBy) {
                 likedByIds.add(like.getLikerId());
             }
 
             for (Bookmark bookmark : bookmarks) {
-                bookmarkIds.add(bookmark.getId());
+                bookmarkIds.add(bookmark.getBookmarkedBy());
             }
 
             for (Post reply: replies) {
                 repliesIds.add(reply.getId());
             }
 
-            postDTOs.add(new PostDTO(post, likedByIds, bookmarkIds, repliesIds));
+            postDTOs.add(new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters));
         }
 
         return postDTOs;

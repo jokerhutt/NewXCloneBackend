@@ -21,12 +21,14 @@ public class RetweetController {
 
     @PostMapping("/newRetweet")
     public ResponseEntity<?> newRetweet(@RequestBody NewRetweet newRetweet) {
+        System.out.println("Controller received like request");
         retweetService.createRetweet(newRetweet);
         return ResponseEntity.ok(postService.findPostDTOById(newRetweet.referenceId));
     }
 
     @PostMapping("/deleteRetweet")
     public ResponseEntity<?> deleteRetweet(@RequestBody NewRetweet retweet) {
+        System.out.println("Controller received delete request");
         retweetService.deleteRetweet(retweet);
         return ResponseEntity.ok(postService.findPostDTOById(retweet.referenceId));
     }

@@ -11,4 +11,6 @@ public interface RetweetRepository extends JpaRepository<Retweet, Integer> {
     boolean existsByRetweeterIdAndReferenceId(Integer retweeterId, Integer referenceId);
 
     Retweet findByRetweeterIdAndReferenceId(Integer retweeterId, Integer referenceId);
+
+    ArrayList<Retweet> findAllByReferenceId(Integer referenceId);
 }

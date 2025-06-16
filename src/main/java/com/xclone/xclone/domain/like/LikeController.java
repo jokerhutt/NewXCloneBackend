@@ -16,7 +16,6 @@ public class LikeController {
 
     @PostMapping("/createLike")
     public ResponseEntity<?> createLike(@RequestBody NewLike newLike) {
-
         return ResponseEntity.ok(likeService.addNewLike(newLike.getLikerId(), newLike.getLikedPostId()));
 
     }

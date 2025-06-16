@@ -21,12 +21,27 @@ public class UserController {
         this.postService = postService;
     }
 
-    @PostMapping("/getUser")
-    public ResponseEntity<?> getUser(@RequestBody ArrayList<Integer> ids) {
+    @PostMapping("/getUsers")
+    public ResponseEntity<?> getUsers(@RequestBody ArrayList<Integer> ids) {
         return ResponseEntity.ok(userService.findAllUserDTOByIds(ids));
 
     }
 
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUserById(@RequestParam Integer id) {
+        return ResponseEntity.ok(userService.findUserByID(id));
+    }
+
+    @GetMapping("/getProfilePic")
+    public ResponseEntity<String> getProfilePic(@RequestParam Integer id) {
+        System.out.println("Requested pfp for: " + id);
+        return ResponseEntity.ok(userService.getUserProfileMedia(id, "profilePic"));
+    }
+
+    @GetMapping("/getBannerImage")
+    public ResponseEntity<String> getBannerImage(@RequestParam Integer id) {
+        return ResponseEntity.ok(userService.getUserProfileMedia(id, "bannerImage"));
+    }
 
 
     @PostMapping("/register")

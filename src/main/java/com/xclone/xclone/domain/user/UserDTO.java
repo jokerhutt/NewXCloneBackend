@@ -10,8 +10,6 @@ public class UserDTO {
     public String username;
     public String email;
     public String bio;
-    public String profilePicture;
-    public String bannerImage;
     public String displayName;
     public ArrayList<Integer> posts;
     public ArrayList<Integer> bookmarkedPosts;
@@ -20,16 +18,15 @@ public class UserDTO {
     public ArrayList<Integer> following;
     public Timestamp createdAt;
     public ArrayList<Integer> replies;
+    public ArrayList<Integer> retweets;
 
 
-    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following, ArrayList<Integer> replies) {
+    public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following, ArrayList<Integer> replies, ArrayList<Integer> retweets) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.bio = user.getBio();
         this.displayName = user.getDisplayName();
-        this.profilePicture = Base64.getEncoder().encodeToString(user.getProfilePicture());
-        this.bannerImage = Base64.getEncoder().encodeToString(user.getBannerImage());
         this.posts = posts;
         this.bookmarkedPosts = bookmarkedPosts;
         this.likedPosts = likedPosts;
@@ -37,6 +34,6 @@ public class UserDTO {
         this.following = following;
         this.createdAt = user.getCreatedAt();
         this.replies = replies;
-
+        this.retweets = retweets;
     }
 }

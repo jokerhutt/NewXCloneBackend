@@ -37,8 +37,9 @@ public class PostController {
 
     }
 
-    @PostMapping("/getPost")
+    @PostMapping("/getPosts")
     public ResponseEntity<?> getPost(@RequestBody ArrayList<Integer> ids) {
+        System.out.println("Received request to retrieve posts");
         return ResponseEntity.ok(postService.findAllPostDTOByIds(ids));
 
     }
