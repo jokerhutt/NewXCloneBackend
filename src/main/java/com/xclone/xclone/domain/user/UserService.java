@@ -44,27 +44,28 @@ public class UserService {
         this.retweetService = retweetService;
     }
 
+    private UserDTO createUserDTO(User user) {
+        ArrayList<Integer> userPosts = postService.findAllPostsByUserId(user.getId());
+        ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(user.getId());
+        ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
+        ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
+        ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
+        ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(user.getId());
+        ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(user.getId());
+        return new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies, userRetweets);
+    }
+
 
 
     public UserDTO findUserByID(Integer id) {
 
         Optional<User> user = this.findById(id);
-        ArrayList<Integer> userPosts = postService.findAllPostsByUserId(id);
-        ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(id);
-        ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(id);
-        ArrayList<Integer> userLikes = likeService.getAllUserLikes(id);
-        ArrayList<Integer> userFollowing = followService.getAllUserFollowing(id);
-        ArrayList<Integer> userFollowers = followService.getAllUserFollowers(id);
-        ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(id);
 
         if (user.isPresent()) {
-            return new UserDTO(user.get(), userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies, userRetweets);
+            return createUserDTO(user.get());
         } else {
             return null;
         }
-
-
-
     }
 
     public String getUserProfileMedia (Integer userId, String type) {
@@ -95,14 +96,7 @@ public class UserService {
     public ArrayList<UserDTO> findAllUserDTOByIds( ArrayList<Integer> ids) {
         ArrayList<UserDTO> userDTOs = new ArrayList<>();
         userRepository.findAllById(ids).forEach(user -> {
-            ArrayList<Integer> userPosts = postService.findAllPostsByUserId(user.getId());
-            ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(user.getId());
-            ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
-            ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
-            ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
-            ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(user.getId());
-            ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(user.getId());
-            userDTOs.add(new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies, userRetweets));
+            userDTOs.add(createUserDTO(user));
         });
         return userDTOs;
     }
