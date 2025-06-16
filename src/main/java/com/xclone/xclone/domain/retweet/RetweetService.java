@@ -44,28 +44,34 @@ public class RetweetService {
 
 
     @Transactional
-    public void createRetweet(NewRetweet newRetweet) {
-        if (!retweetRepository.existsByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId)) {
-            System.out.println("Received create request");
+    public boolean createRetweet(NewRetweet newRetweet) {
 
-            Retweet retweet = new Retweet();
-            retweet.setRetweeterId(newRetweet.retweeterId);
-            retweet.setReferenceId(newRetweet.referenceId);
-            retweet.setType(newRetweet.type);
+        if (retweetRepository.existsByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId)) {
+            throw new IllegalStateException("Retweet exists");
 
-            notificationService.createNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
-
-            retweetRepository.save(retweet);
         }
+
+        Retweet retweet = new Retweet();
+        retweet.setRetweeterId(newRetweet.retweeterId);
+        retweet.setReferenceId(newRetweet.referenceId);
+        retweet.setType(newRetweet.type);
+
+        retweetRepository.save(retweet);
+        notificationService.createNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
+
+        return true;
+
     }
 
     @Transactional
-    public void deleteRetweet(NewRetweet newRetweet) {
-        System.out.println("Received delete request");
+    public boolean deleteRetweet(NewRetweet newRetweet) {
         Retweet toDelete = retweetRepository.findByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId);
         if (toDelete != null) {
             notificationService.deleteNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
             retweetRepository.delete(toDelete);
+            return true;
+        } else {
+            throw new IllegalStateException("Retweet not found");
         }
 
     }
