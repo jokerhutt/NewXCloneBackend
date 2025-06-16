@@ -145,8 +145,8 @@ public class UserService {
         System.out.println("BannerImage length: " + signupUser.getBannerImage().length);
         System.out.println("BannerImage preview: " + Base64.getEncoder().encodeToString(signupUser.getBannerImage()).substring(0, 100));
 
-        user.setProfilePicture(signupUser.getProfilePicture()); // already byte[]
-        user.setBannerImage(signupUser.getBannerImage());       // already byte[]
+        user.setProfilePicture(signupUser.getProfilePicture());
+        user.setBannerImage(signupUser.getBannerImage());
 
 
         userRepository.save(user);

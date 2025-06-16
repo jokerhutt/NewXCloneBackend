@@ -35,29 +35,35 @@ public class LikeService {
     }
 
     @Transactional
-    public PostDTO addNewLike(Integer likerId, Integer likedPostId) {
+    public boolean addNewLike(Integer likerId, Integer likedPostId) {
+
+        if (likeRepository.existsByLikerIdAndLikedPostId(likerId, likedPostId)) {
+            throw new IllegalStateException("Like exists");
+        }
+
         Like like = new Like();
         like.setLikedPostId(likedPostId);
         like.setLikerId(likerId);
+        likeRepository.save(like);
+        notificationService.handlePostCreateNotification(likerId, likedPostId, "like");
 
-        if (!likeRepository.existsByLikerIdAndLikedPostId(likerId, likedPostId)) {
-            likeRepository.save(like);
-            notificationService.handlePostCreateNotification(likerId, likedPostId, "like");
-        }
-
-        return postService.findPostDTOById(likedPostId);
+        return true;
 
     }
+
+
+
     @Transactional
-    public PostDTO deleteLike(Integer likerId, Integer likedPostId) {
+    public boolean deleteLike(Integer likerId, Integer likedPostId) {
 
         Optional<Like> toDelete = likeRepository.findByLikerIdAndLikedPostId(likerId, likedPostId);
         if (toDelete.isPresent()) {
             likeRepository.delete(toDelete.get());
             notificationService.handlePostDeleteNotification(likerId, likedPostId, "like");
+            return true;
+        } else {
+            throw new IllegalStateException("Like does not exist");
         }
-
-        return postService.findPostDTOById(likedPostId);
 
     }
 

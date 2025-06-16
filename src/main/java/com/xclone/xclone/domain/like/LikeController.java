@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/likes")
 public class LikeController {
@@ -16,14 +18,23 @@ public class LikeController {
 
     @PostMapping("/createLike")
     public ResponseEntity<?> createLike(@RequestBody NewLike newLike) {
-        return ResponseEntity.ok(likeService.addNewLike(newLike.getLikerId(), newLike.getLikedPostId()));
-
+        try {
+            likeService.addNewLike(newLike.getLikerId(), newLike.getLikedPostId());
+            return ResponseEntity.ok(Map.of("message", "Like created"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/deleteLike")
     public ResponseEntity<?> removeLike(@RequestBody NewLike newLike) {
 
-        return ResponseEntity.ok(likeService.deleteLike(newLike.getLikerId(), newLike.getLikedPostId()));
+        try {
+            likeService.deleteLike(newLike.getLikerId(), newLike.getLikedPostId());
+            return ResponseEntity.ok(Map.of("message", "Like removed"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        }
 
 
     }
