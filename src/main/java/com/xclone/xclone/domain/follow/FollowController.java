@@ -24,8 +24,8 @@ public class FollowController {
     @PostMapping("/followUser")
     public ResponseEntity<?> createFollow (@RequestBody NewFollow newFollow) {
         try {
-            followService.addNewFollow(newFollow.followerId, newFollow.followedId);
-            return ResponseEntity.ok(Map.of("message", "Like created"));
+            UserDTO followedUserToReturn = followService.addNewFollow(newFollow.followerId, newFollow.followedId);
+            return ResponseEntity.ok(followedUserToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
@@ -34,8 +34,8 @@ public class FollowController {
     @PostMapping("/unfollowUser")
     public ResponseEntity<?> unfollowUser (@RequestBody NewFollow newFollow) {
         try {
-            followService.deleteFollow(newFollow.followerId, newFollow.followedId);
-            return ResponseEntity.ok(Map.of("message", "Follow removed"));
+            UserDTO followedUserToReturn = followService.deleteFollow(newFollow.followerId, newFollow.followedId);
+            return ResponseEntity.ok(followedUserToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
