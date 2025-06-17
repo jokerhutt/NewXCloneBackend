@@ -35,10 +35,10 @@ public class LikeService {
     }
 
     @Transactional
-    public boolean addNewLike(Integer likerId, Integer likedPostId) {
+    public PostDTO addNewLike(Integer likerId, Integer likedPostId) {
 
         if (likeRepository.existsByLikerIdAndLikedPostId(likerId, likedPostId)) {
-            throw new IllegalStateException("Like exists");
+            throw new IllegalStateException("Like already exists");
         }
 
         Like like = new Like();
@@ -47,23 +47,29 @@ public class LikeService {
         likeRepository.save(like);
         notificationService.createNotificationFromType(likerId, likedPostId, "like");
 
-        return true;
+        PostDTO postDTO = postService.findPostDTOById(likedPostId);
+        if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
+
+        return postDTO;
 
     }
 
 
 
     @Transactional
-    public boolean deleteLike(Integer likerId, Integer likedPostId) {
+    public PostDTO deleteLike(Integer likerId, Integer likedPostId) {
 
         Optional<Like> toDelete = likeRepository.findByLikerIdAndLikedPostId(likerId, likedPostId);
-        if (toDelete.isPresent()) {
-            likeRepository.delete(toDelete.get());
-            notificationService.deleteNotificationFromType(likerId, likedPostId, "like");
-            return true;
-        } else {
-            throw new IllegalStateException("Like does not exist");
-        }
+        if (!toDelete.isPresent()) throw new IllegalStateException("Like to delete does not exist");
+
+        likeRepository.delete(toDelete.get());
+        notificationService.deleteNotificationFromType(likerId, likedPostId, "like");
+
+        PostDTO postDTO = postService.findPostDTOById(likedPostId);
+        if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
+
+        return postDTO;
+
 
     }
 
