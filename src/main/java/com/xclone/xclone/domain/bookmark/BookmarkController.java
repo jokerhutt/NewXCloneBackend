@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.bookmark;
 
+import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,18 +13,16 @@ import java.util.Map;
 public class BookmarkController {
 
     private final BookmarkService bookmarkService;
-    private final PostService postService;
 
-    public BookmarkController(BookmarkService bookmarkService, PostService postService) {
+    public BookmarkController(BookmarkService bookmarkService) {
         this.bookmarkService = bookmarkService;
-        this.postService = postService;
     }
 
     @PostMapping("/createBookmark")
     public ResponseEntity<?> createBookmark(@RequestBody NewBookmark newBookmark) {
         try {
-            bookmarkService.addNewBookmark(newBookmark.getBookmarkedBy(), newBookmark.getBookmarkedPost());
-            return ResponseEntity.ok(Map.of("message", "Bookmark created"));
+            PostDTO bookmarkToReturn = bookmarkService.addNewBookmark(newBookmark.getBookmarkedBy(), newBookmark.getBookmarkedPost());
+            return ResponseEntity.ok(bookmarkToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }

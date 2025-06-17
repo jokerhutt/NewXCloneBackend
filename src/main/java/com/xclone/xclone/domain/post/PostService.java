@@ -6,6 +6,7 @@ import com.xclone.xclone.domain.like.Like;
 import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.notification.NotificationService;
 import com.xclone.xclone.domain.retweet.Retweet;
+import com.xclone.xclone.domain.retweet.RetweetRepository;
 import com.xclone.xclone.domain.retweet.RetweetService;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
@@ -29,16 +30,16 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final NotificationService notificationService;
-    private final RetweetService retweetService;
+    private final RetweetRepository retweetRepository;
     private final PostMediaRepository postMediaRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetService retweetService, PostMediaRepository postMediaRepository) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.notificationService = notificationService;
-        this.retweetService = retweetService;
+        this.retweetRepository = retweetRepository;
         this.postMediaRepository = postMediaRepository;
     }
 
@@ -106,7 +107,8 @@ public class PostService {
         ArrayList<Post> replies = postRepository.findAllByParentId(post.getId());
         ArrayList<Integer> repliesIds = new ArrayList<>();
 
-        ArrayList<Integer> retweeters = retweetService.getAllRetweetersByPostID(post.getId());
+        ArrayList<Retweet> retweets = retweetRepository.findAllByReferenceId(post.getId());
+        ArrayList<Integer> retweeters = new ArrayList<>();
         ArrayList<Integer> postMediaIds = new ArrayList<>();
         ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
 
@@ -120,6 +122,10 @@ public class PostService {
 
         for (Post reply: replies) {
             repliesIds.add(reply.getId());
+        }
+
+        for (Retweet retweet: retweets) {
+            retweeters.add(retweet.getRetweeterId());
         }
 
         if (postMedia != null) {

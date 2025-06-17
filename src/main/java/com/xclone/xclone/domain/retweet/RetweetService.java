@@ -1,7 +1,9 @@
 package com.xclone.xclone.domain.retweet;
 
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostDTO;
+import com.xclone.xclone.domain.post.PostService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +16,13 @@ public class RetweetService {
 
     private final NotificationService notificationService;
     private final RetweetRepository retweetRepository;
+    private final PostService postService;
 
     @Autowired
-    public RetweetService(NotificationService notificationService, RetweetRepository retweetRepository) {
+    public RetweetService(NotificationService notificationService, RetweetRepository retweetRepository, PostService postService) {
         this.notificationService = notificationService;
         this.retweetRepository = retweetRepository;
+        this.postService = postService;
     }
 
     public ArrayList<Integer> getAllRetweetedPostsByUserID(Integer retweeterId) {
@@ -44,7 +48,7 @@ public class RetweetService {
 
 
     @Transactional
-    public boolean createRetweet(NewRetweet newRetweet) {
+    public PostDTO createRetweet(NewRetweet newRetweet) {
 
         if (retweetRepository.existsByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId)) {
             throw new IllegalStateException("Retweet exists");
@@ -59,17 +63,23 @@ public class RetweetService {
         retweetRepository.save(retweet);
         notificationService.createNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
 
-        return true;
+        PostDTO postDTO = postService.findPostDTOById(newRetweet.referenceId);
+        if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
+
+        return postDTO;
 
     }
 
     @Transactional
-    public boolean deleteRetweet(NewRetweet newRetweet) {
+    public PostDTO deleteRetweet(NewRetweet newRetweet) {
         Retweet toDelete = retweetRepository.findByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId);
         if (toDelete != null) {
             notificationService.deleteNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
             retweetRepository.delete(toDelete);
-            return true;
+            PostDTO postDTO = postService.findPostDTOById(newRetweet.referenceId);
+            if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
+
+            return postDTO;
         } else {
             throw new IllegalStateException("Retweet not found");
         }

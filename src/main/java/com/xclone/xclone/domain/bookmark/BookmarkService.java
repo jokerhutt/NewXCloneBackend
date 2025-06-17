@@ -31,7 +31,7 @@ public class BookmarkService {
     }
 
     @Transactional
-    public boolean addNewBookmark(Integer userId, Integer bookmarkedPost) {
+    public PostDTO addNewBookmark(Integer userId, Integer bookmarkedPost) {
 
         if (bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost)) {
             throw new IllegalStateException("Bookmark exists");
@@ -43,20 +43,23 @@ public class BookmarkService {
 
         bookmarkRepository.save(bookmark);
 
-        return true;
+        PostDTO postDTO = postService.findPostDTOById(bookmarkedPost);
+        if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
 
+        return postDTO;
     }
 
     @Transactional
-    public boolean deleteBookmark(Integer userId, Integer bookmarkedPost) {
+    public PostDTO deleteBookmark(Integer userId, Integer bookmarkedPost) {
 
         Optional<Bookmark> toDelete = bookmarkRepository.findByBookmarkedByAndBookmarkedPost(userId, bookmarkedPost);
-        if (toDelete.isPresent()) {
-            bookmarkRepository.delete(toDelete.get());
-            return true;
-        } else {
-            throw new IllegalStateException("Bookmark does not exist");
-        }
+        if (!toDelete.isPresent()) throw new IllegalStateException("Bookmark does not exist");
+
+        bookmarkRepository.delete(toDelete.get());
+        PostDTO postDTO = postService.findPostDTOById(bookmarkedPost);
+        if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
+
+        return postDTO;
 
     }
 

@@ -1,6 +1,8 @@
 package com.xclone.xclone.domain.user;
 
 import com.xclone.xclone.domain.bookmark.BookmarkService;
+import com.xclone.xclone.domain.follow.Follow;
+import com.xclone.xclone.domain.follow.FollowRepository;
 import com.xclone.xclone.domain.follow.FollowService;
 import com.xclone.xclone.domain.like.LikeService;
 import com.xclone.xclone.domain.post.Post;
@@ -31,28 +33,38 @@ public class UserService {
     private final PostService postService;
     private final BookmarkService bookmarkService;
     private final LikeService likeService;
-    private final FollowService followService;
+
     private final RetweetService retweetService;
+    private final FollowRepository followRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, FollowService followService, RetweetService retweetService) {
+    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, RetweetService retweetService, FollowRepository followRepository) {
         this.userRepository = userRepository;
         this.postService = postService;
         this.bookmarkService = bookmarkService;
         this.likeService = likeService;
-        this.followService = followService;
+
         this.retweetService = retweetService;
+        this.followRepository = followRepository;
     }
 
     private UserDTO createUserDTO(User user) {
         ArrayList<Integer> userPosts = postService.findAllPostsByUserId(user.getId());
         ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(user.getId());
         ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
-        ArrayList<Integer> userFollowing = followService.getAllUserFollowing(user.getId());
-        ArrayList<Integer> userFollowers = followService.getAllUserFollowers(user.getId());
+        ArrayList<Follow> userFollowing = followRepository.findAllByFollowerId(user.getId());
+        ArrayList<Integer> userFollowingIds = new ArrayList<>();
+        for (Follow follow : userFollowing) {
+            userFollowingIds.add(follow.getFollowedId());
+        }
+        ArrayList<Integer> userFollowerIds = new ArrayList<>();
+        ArrayList<Follow> userFollowers = followRepository.findAllByFollowedId(user.getId());
+        for (Follow follow : userFollowers) {
+            userFollowerIds.add(follow.getFollowerId());
+        }
         ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(user.getId());
         ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(user.getId());
-        return new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowers, userFollowing, userReplies, userRetweets);
+        return new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowerIds, userFollowingIds, userReplies, userRetweets);
     }
 
 

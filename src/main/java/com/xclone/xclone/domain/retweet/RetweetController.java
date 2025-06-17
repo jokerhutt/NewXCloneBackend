@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.retweet;
 
+import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +16,17 @@ import java.util.Map;
 public class RetweetController {
 
     private final RetweetService retweetService;
-    private final PostService postService;
 
-    public RetweetController(RetweetService retweetService, PostService postService) {
+
+    public RetweetController(RetweetService retweetService) {
         this.retweetService = retweetService;
-        this.postService = postService;
     }
 
     @PostMapping("/newRetweet")
     public ResponseEntity<?> newRetweet(@RequestBody NewRetweet newRetweet) {
         try {
-            retweetService.createRetweet(newRetweet);
-            return ResponseEntity.ok(Map.of("message", "Retweet created"));
+            PostDTO postToReturn = retweetService.createRetweet(newRetweet);
+            return ResponseEntity.ok(postToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
@@ -35,8 +35,8 @@ public class RetweetController {
     @PostMapping("/deleteRetweet")
     public ResponseEntity<?> deleteRetweet(@RequestBody NewRetweet retweet) {
         try {
-            retweetService.deleteRetweet(retweet);
-            return ResponseEntity.ok(Map.of("message", "Retweet removed"));
+            PostDTO postToReturn = retweetService.deleteRetweet(retweet);
+            return ResponseEntity.ok(postToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         }
