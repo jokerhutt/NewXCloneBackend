@@ -7,6 +7,7 @@ import com.xclone.xclone.domain.post.PostMediaRepository;
 import com.xclone.xclone.domain.post.PostRepository;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +26,18 @@ public class EdgeRank {
     private final PostMediaRepository postMediaRepository;
     private final LikeRepository likeRepository;
     private final UserService userService;
+    private final FeedEntryRepository feedEntryRepository;
 
     @Autowired
-    public EdgeRank (PostRepository postRepository, PostMediaRepository postMediaRepository, LikeRepository likeRepository, UserService userService) {
+    public EdgeRank (PostRepository postRepository, PostMediaRepository postMediaRepository, LikeRepository likeRepository, UserService userService, FeedEntryRepository feedEntryRepository) {
         this.postRepository = postRepository;
         this.postMediaRepository = postMediaRepository;
         this.likeRepository = likeRepository;
         this.userService = userService;
+        this.feedEntryRepository = feedEntryRepository;
     }
 
-    public ArrayList<Integer> buildFeed (Integer userId) {
+    public ArrayList<PostRank> buildFeed (Integer userId) {
 
         ArrayList<Integer> feed = new ArrayList<>();
         UserDTO userDTO = userService.findUserByID(userId);
@@ -48,14 +51,29 @@ public class EdgeRank {
 
         computeTotalScore(postRanks, userDTO);
 
-        postRanks.sort((a, b) -> Double.compare(b.totalScore, a.totalScore));
 
-        for (PostRank pr : postRanks) {
-            feed.add(pr.post.getId());
+        postRanks.sort((a, b) -> Double.compare(b.totalScore, a.totalScore));
+        return postRanks;
+
+
+    }
+
+    @Transactional
+    public void saveFeed(Integer userId, ArrayList<PostRank> feed) {
+        feedEntryRepository.deleteByUserId(userId);
+
+        ArrayList<FeedEntry> feedEntries = new ArrayList<>();
+        for (int i = 0; i < feed.size(); i++) {
+            PostRank pr = feed.get(i);
+            FeedEntry feedEntry = new FeedEntry();
+            feedEntry.setUserId(userId);
+            feedEntry.setPostId(pr.post.getId());
+            feedEntry.setScore(pr.totalScore);
+            feedEntry.setPosition(i);
+            feedEntries.add(feedEntry);
         }
 
-        return feed;
-
+        feedEntryRepository.saveAll(feedEntries);
     }
 
 

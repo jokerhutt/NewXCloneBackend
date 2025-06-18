@@ -5,6 +5,9 @@ import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostRepository;
 import com.xclone.xclone.domain.post.PostService;
+import com.xclone.xclone.domain.user.UserDTO;
+import com.xclone.xclone.domain.user.UserRepository;
+import com.xclone.xclone.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,17 +24,25 @@ public class FeedService {
 
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final FeedEntryRepository feedEntryRepository;
+    private final EdgeRank edgeRank;
+    private final UserRepository userRepository;
+    private final UserService userService;
     PostRepository postRepository;
 
     @Autowired
-    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository) {
+    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, FeedEntryRepository feedEntryRepository, EdgeRank edgeRank, UserRepository userRepository, UserService userService) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
+        this.feedEntryRepository = feedEntryRepository;
+        this.edgeRank = edgeRank;
+        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public Map<String, Object> getPaginatedPostIds(int cursor, int limit, Integer userId, String type) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by("id").descending());
+        Pageable pageable = PageRequest.of(0, limit);
         List<Integer> ids = getPaginatedFeed(type, userId, cursor, pageable);
 
         Integer nextCursor = ids.size() < limit ? null : ids.get(ids.size() - 1);
@@ -45,7 +56,7 @@ public class FeedService {
     public List<Integer> getPaginatedFeed(String type, Integer userId, int cursor, Pageable pageable) {
         switch (type.toLowerCase()) {
             case "foryou":
-                return postRepository.findNextPaginatedPostIds(cursor, pageable);
+                return getUsersForYouFeed(userId, cursor, pageable);
 
             case "liked":
                 if (userId == null) throw new IllegalArgumentException("userId required for liked feed");
@@ -68,6 +79,49 @@ public class FeedService {
         }
     }
 
+    private List<Integer> getUsersForYouFeed (Integer userId, int cursor, Pageable pageable) {
 
+        if (userId == null) {
+            System.out.println("userId required for you feed, getting generic");
+            return postRepository.findNextPaginatedPostIds(cursor, pageable);
+        } else {
+
+            printFeed(feedEntryRepository.findByUserIdOrderByPositionAsc(13), userId);
+
+            List<Integer> ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
+            System.out.println("Old ids is: " + ids);
+
+            if (ids.isEmpty()) {
+                ArrayList<PostRank> postRanks = edgeRank.buildFeed(userId);
+                edgeRank.saveFeed(userId, postRanks);
+                ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
+            }
+            System.out.println("to return ids is: " + ids);
+            return ids;
+        }
+    }
+
+    private void printFeed(List<FeedEntry> feedEntries, Integer userId) {
+
+        UserDTO user = userService.findUserByID(userId);
+
+        System.out.println("GENERATED FEED FOR USER: " + user.username);
+        System.out.println("--------------------------------------------------------------");
+        System.out.printf("| %-7s | %-7s | %-9s | %-9s |\n", "PostId", "UserId", "Score", "Position");
+        System.out.println("--------------------------------------------------------------");
+
+        for (FeedEntry entry : feedEntries) {
+            System.out.printf(
+                    "| %-7d | %-7d | %-9.4f | %-9d |\n",
+                    entry.getPostId(),
+                    entry.getUserId(),
+                    entry.getScore(),
+                    entry.getPosition()
+            );
+        }
+
+        System.out.println("--------------------------------------------------------------");
+    }
 
 }
+

@@ -19,11 +19,11 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
     Optional<Like> findByLikerIdAndLikedPostId(Integer likerId, Integer likedPostId);
 
     @Query("""
-    SELECT l.likedPostId
-    FROM Like l
-    WHERE l.likerId = :userId
-      AND l.likedPostId < :cursor
-    ORDER BY l.likedPostId DESC
+SELECT l.likedPostId
+FROM Like l
+WHERE l.likerId = :userId
+  AND l.likedPostId > :cursor
+ORDER BY l.likedPostId ASC
 """)
     List<Integer> findPaginatedLikedPostIds(
             @Param("userId") int userId,
