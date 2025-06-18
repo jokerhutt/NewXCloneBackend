@@ -12,6 +12,9 @@ import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,24 @@ public class PostService {
             return postMedia;
         }
 
+    }
+
+    public Map<String, Object> getPaginatedPostDTOs(int cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("id").descending());
+        List<Post> posts = postRepository.findNextPosts(cursor, pageable);
+
+        ArrayList<Integer> ids = new ArrayList<>();
+
+        for (Post post : posts) {
+            ids.add(post.getId());
+        }
+
+        Integer nextCursor = posts.size() < limit ? null : posts.get(posts.size() - 1).getId();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", ids);
+        response.put("nextCursor", nextCursor);
+        return response;
     }
 
     public Map preparePostMediaMapToBase64 (PostMedia postMedia) {

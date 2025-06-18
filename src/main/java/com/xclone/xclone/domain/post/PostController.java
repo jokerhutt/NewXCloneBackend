@@ -43,6 +43,8 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPostMediaByPostId(ids));
     }
 
+
+
     //TODO cleanup
     @GetMapping("/getPostMediaById")
     public ResponseEntity<?> getPostMedia(@RequestParam Integer id) {
@@ -56,15 +58,12 @@ public class PostController {
         return ResponseEntity.ok(encodedPostMedia);
     }
 
-    @GetMapping("/getForYouFeed")
-    public ResponseEntity<?> getAllPosts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+    @GetMapping("/getFeedPage")
+    public ResponseEntity<?> getFeedPage(
+            @RequestParam(defaultValue = "0") int cursor,
+            @RequestParam(defaultValue = "10") int limit
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Integer> postPage = postRepository.findAllPostIds(pageable);
-        List<Integer> ids = postPage.getContent();
-        return ResponseEntity.ok(ids);
+        return ResponseEntity.ok(postService.getPaginatedPostDTOs(cursor, limit));
     }
 
     @GetMapping("/getSinglePost/{id}")
