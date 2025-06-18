@@ -19,6 +19,19 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT p.id FROM Post p WHERE p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Integer> findNextPaginatedPostIds(@Param("cursor") int cursor, Pageable pageable);
 
+    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
+    List<Integer> findPaginatedTweetIdsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
+
+    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NOT NULL AND p.id < :cursor ORDER BY p.id DESC")
+    List<Integer> findPaginatedReplyIdsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
+
     @Query("SELECT p.id FROM Post p")
     Page<Integer> findAllPostIds(Pageable pageable);
+
+    @Query("SELECT p.id FROM Post p WHERE p.userId = :authorId AND p.parentId IS NULL")
+    List<Integer> findPostIdsByAuthor(@Param("authorId") int authorId);
+
+    @Query("SELECT p FROM Post p WHERE p.parentId IS NULL")
+    List<Post> findAllTopLevelPosts();
+
 }

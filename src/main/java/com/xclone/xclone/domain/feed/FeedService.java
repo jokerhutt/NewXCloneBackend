@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.feed;
 
+import com.xclone.xclone.domain.bookmark.BookmarkRepository;
 import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostRepository;
@@ -19,12 +20,14 @@ import java.util.Map;
 public class FeedService {
 
     private final LikeRepository likeRepository;
+    private final BookmarkRepository bookmarkRepository;
     PostRepository postRepository;
 
     @Autowired
-    public FeedService(PostRepository postRepository, LikeRepository likeRepository) {
+    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     public Map<String, Object> getPaginatedPostIds(int cursor, int limit, Integer userId, String type) {
@@ -47,6 +50,18 @@ public class FeedService {
             case "liked":
                 if (userId == null) throw new IllegalArgumentException("userId required for liked feed");
                 return likeRepository.findPaginatedLikedPostIds(userId, cursor, pageable);
+
+            case "tweets":
+                if (userId == null) throw new IllegalArgumentException("userId required for posts feed");
+                return postRepository.findPaginatedTweetIdsByUserId(userId, cursor, pageable);
+
+            case "replies":
+                if (userId == null) throw new IllegalArgumentException("userId required for replies feed");
+                return postRepository.findPaginatedReplyIdsByUserId(userId, cursor, pageable);
+
+            case "bookmarks":
+                if (userId == null) throw new IllegalArgumentException("userId required for bookmarks feed");
+                return bookmarkRepository.findPaginatedBookmarkedPostIds(userId, cursor, pageable);
 
             default:
                 throw new IllegalArgumentException("Unknown feed type: " + type);
