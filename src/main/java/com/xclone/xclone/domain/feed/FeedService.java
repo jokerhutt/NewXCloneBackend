@@ -2,9 +2,7 @@ package com.xclone.xclone.domain.feed;
 
 import com.xclone.xclone.domain.bookmark.BookmarkRepository;
 import com.xclone.xclone.domain.like.LikeRepository;
-import com.xclone.xclone.domain.post.Post;
-import com.xclone.xclone.domain.post.PostRepository;
-import com.xclone.xclone.domain.post.PostService;
+import com.xclone.xclone.domain.post.*;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserRepository;
 import com.xclone.xclone.domain.user.UserService;
@@ -28,10 +26,11 @@ public class FeedService {
     private final EdgeRank edgeRank;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final PostMediaRepository postMediaRepository;
     PostRepository postRepository;
 
     @Autowired
-    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, FeedEntryRepository feedEntryRepository, EdgeRank edgeRank, UserRepository userRepository, UserService userService) {
+    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, FeedEntryRepository feedEntryRepository, EdgeRank edgeRank, UserRepository userRepository, UserService userService, PostMediaRepository postMediaRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
@@ -39,6 +38,7 @@ public class FeedService {
         this.edgeRank = edgeRank;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.postMediaRepository = postMediaRepository;
     }
 
     public Map<String, Object> getPaginatedPostIds(int cursor, int limit, Integer userId, String type) {
@@ -77,6 +77,10 @@ public class FeedService {
             case "bookmarks":
                 if (userId == null) throw new IllegalArgumentException("userId required for bookmarks feed");
                 return bookmarkRepository.findPaginatedBookmarkedPostIds(userId, cursor, pageable);
+
+            case "media":
+                if (userId == null) throw new IllegalArgumentException("userId required for media feed");
+                return postRepository.findPaginatedPostIdsWithMediaByUserId(userId, cursor, pageable);
 
             default:
                 throw new IllegalArgumentException("Unknown feed type: " + type);

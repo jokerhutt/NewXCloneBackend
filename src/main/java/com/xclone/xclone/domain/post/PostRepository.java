@@ -22,6 +22,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id > :cursor ORDER BY p.id DESC")
     List<Integer> findPaginatedTweetIdsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
 
+    @Query("SELECT p FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id > :cursor ORDER BY p.id DESC")
+    List<Post> findPaginatedTweetsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
+
     @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NOT NULL AND p.id > :cursor ORDER BY p.id DESC")
     List<Integer> findPaginatedReplyIdsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
 
@@ -36,5 +39,20 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p WHERE p.parentId IS NULL")
     List<Post> findAllTopLevelPosts();
+
+    @Query("""
+    SELECT p.id FROM Post p
+    WHERE p.userId = :userId
+      AND p.id > :cursor
+      AND p.id IN (
+        SELECT DISTINCT pm.postId FROM PostMedia pm
+      )
+    ORDER BY p.id DESC
+""")
+    List<Integer> findPaginatedPostIdsWithMediaByUserId(
+            @Param("userId") int userId,
+            @Param("cursor") int cursor,
+            Pageable pageable
+    );
 
 }
