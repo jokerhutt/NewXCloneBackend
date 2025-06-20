@@ -55,8 +55,12 @@ public class FeedService {
 
     public List<Integer> getPaginatedFeed(String type, Integer userId, int cursor, Pageable pageable) {
         switch (type.toLowerCase()) {
-            case "foryou":
+            case "for you":
                 return getUsersForYouFeed(userId, cursor, pageable);
+
+            case "following":
+                UserDTO user = userService.findUserByID(userId);
+                return postRepository.findPaginatedPostIdsFromFollowedUsers(user.following, cursor, pageable);
 
             case "liked":
                 if (userId == null) throw new IllegalArgumentException("userId required for liked feed");
