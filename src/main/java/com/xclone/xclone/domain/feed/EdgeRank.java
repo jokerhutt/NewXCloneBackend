@@ -83,6 +83,7 @@ public class EdgeRank {
             computeWeights(postRank);
             computeTimeDecayValue(postRank);
             postRank.computeTotalScore();
+            calculateIfOwnRecentPost(postRank, feedUser);
         }
     }
 
@@ -113,6 +114,13 @@ public class EdgeRank {
             return 0;
         } else {
             return 0.4f;
+        }
+    }
+
+    private void calculateIfOwnRecentPost (PostRank postRank, UserDTO feedUser) {
+        boolean isOwnRecentPost = postRank.post.getUserId().equals(feedUser.id) && ChronoUnit.HOURS.between(postRank.post.getCreatedAt().toLocalDateTime(), LocalDateTime.now()) <= 6;
+        if (isOwnRecentPost) {
+            postRank.totalScore += 9999;
         }
     }
 
