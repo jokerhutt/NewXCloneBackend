@@ -16,7 +16,7 @@ public interface FeedEntryRepository extends JpaRepository<FeedEntry, Integer> {
     @Query("""
 SELECT f.postId
 FROM FeedEntry f
-WHERE f.userId = :userId AND f.position >= :cursor
+WHERE f.userId = :userId AND f.position > :cursor
 ORDER BY f.position ASC
 """)
     List<Integer> getFeedPostIdsCustom(
@@ -26,4 +26,10 @@ ORDER BY f.position ASC
     );
 
     void deleteByUserId(Integer userId);
+
+    List<FeedEntry> findAllByUserId(Integer userId);
+
+    FeedEntry findByPostId(Integer postId);
+
+    FeedEntry findByPostIdAndUserId(Integer postId, Integer userId);
 }

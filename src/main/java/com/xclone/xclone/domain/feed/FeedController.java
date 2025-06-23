@@ -24,6 +24,7 @@ public class FeedController {
             @RequestParam(required = false) Integer userId,
             @RequestParam(defaultValue = "10") int limit
     ) {
+        System.out.println("Received request for type " + type + " cursor " + cursor + " limit " + limit);
         return ResponseEntity.ok(feedService.getPaginatedPostIds(cursor, limit, userId, type));
     }
 

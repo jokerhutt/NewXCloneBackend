@@ -12,10 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FeedService {
@@ -44,12 +41,22 @@ public class FeedService {
     public Map<String, Object> getPaginatedPostIds(int cursor, int limit, Integer userId, String type) {
         Pageable pageable = PageRequest.of(0, limit);
         List<Integer> ids = getPaginatedFeed(type, userId, cursor, pageable);
+        System.out.println("Getting paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
 
-        Integer nextCursor = ids.size() < limit ? null : cursor + ids.size();
+        Integer nextCursor;
+
+        if (type.equals("For You") && userId != null) {
+            nextCursor = ids.get(ids.size() - 1);
+            FeedEntry feedEntry = feedEntryRepository.findByPostIdAndUserId(nextCursor, userId);
+            nextCursor = feedEntry.getPosition();
+        } else {
+            nextCursor = ids.size() < limit ? null : ids.get(ids.size() - 1);
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("posts", ids);
         response.put("nextCursor", nextCursor);
+        System.out.println("Returned: " + Arrays.toString(ids.toArray()) + " cursor: " + nextCursor + " limit: " + limit + " user: " + userId + " type: " + type);
         return response;
     }
 
@@ -88,13 +95,12 @@ public class FeedService {
     }
 
     private List<Integer> getUsersForYouFeed (Integer userId, int cursor, Pageable pageable) {
+//        printFeed(feedEntryRepository.findAllByUserId(13), 13);
 
         if (userId == null) {
             System.out.println("userId required for you feed, getting generic");
             return postRepository.findNextPaginatedPostIds(cursor, pageable);
         } else {
-
-            printFeed(feedEntryRepository.findByUserIdOrderByPositionAsc(13), userId);
 
             List<Integer> ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
             System.out.println("Old ids is: " + ids);

@@ -16,19 +16,19 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Optional<List<Post>> findAllByUserId(int id);
     ArrayList<Post> findAllByParentId(Integer id);
 
-    @Query("SELECT p.id FROM Post p WHERE p.parentId IS NULL AND p.id > :cursor ORDER BY p.id DESC")
+    @Query("SELECT p.id FROM Post p WHERE p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Integer> findNextPaginatedPostIds(@Param("cursor") int cursor, Pageable pageable);
 
-    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id > :cursor ORDER BY p.id DESC")
+    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Integer> findPaginatedTweetIdsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
 
-    @Query("SELECT p FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id > :cursor ORDER BY p.id DESC")
+    @Query("SELECT p FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Post> findPaginatedTweetsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
 
-    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NOT NULL AND p.id > :cursor ORDER BY p.id DESC")
+    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NOT NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Integer> findPaginatedReplyIdsByUserId(@Param("userId") int userId, @Param("cursor") int cursor, Pageable pageable);
 
-    @Query("SELECT p.id FROM Post p WHERE p.userId IN :followedUserIds AND p.parentId IS NULL AND p.id > :cursor ORDER BY p.id DESC")
+    @Query("SELECT p.id FROM Post p WHERE p.userId IN :followedUserIds AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Integer> findPaginatedPostIdsFromFollowedUsers(@Param("followedUserIds") List<Integer> followedUserIds, @Param("cursor") int cursor, Pageable pageable);
 
     @Query("SELECT p.id FROM Post p")
@@ -43,7 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("""
     SELECT p.id FROM Post p
     WHERE p.userId = :userId
-      AND p.id > :cursor
+      AND p.id < :cursor
       AND p.id IN (
         SELECT DISTINCT pm.postId FROM PostMedia pm
       )

@@ -20,8 +20,8 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
     SELECT b.bookmarkedPost
     FROM Bookmark b
     WHERE b.bookmarkedBy = :userId
-      AND b.bookmarkedPost > :cursor
-    ORDER BY b.bookmarkedPost ASC
+      AND b.bookmarkedPost < :cursor
+    ORDER BY b.bookmarkedPost DESC
 """)
     List<Integer> findPaginatedBookmarkedPostIds(
             @Param("userId") int userId,

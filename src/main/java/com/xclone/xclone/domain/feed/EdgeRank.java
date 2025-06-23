@@ -83,6 +83,7 @@ public class EdgeRank {
         System.out.println(" Savin feed " + userId);
 
         feedEntryRepository.saveAll(feedEntries);
+
     }
 
 
