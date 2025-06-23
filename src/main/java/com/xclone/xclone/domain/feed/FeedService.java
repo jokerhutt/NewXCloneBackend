@@ -45,7 +45,7 @@ public class FeedService {
         Pageable pageable = PageRequest.of(0, limit);
         List<Integer> ids = getPaginatedFeed(type, userId, cursor, pageable);
 
-        Integer nextCursor = ids.size() < limit ? null : ids.get(ids.size() - 1);
+        Integer nextCursor = ids.size() < limit ? null : cursor + ids.size();
 
         Map<String, Object> response = new HashMap<>();
         response.put("posts", ids);
