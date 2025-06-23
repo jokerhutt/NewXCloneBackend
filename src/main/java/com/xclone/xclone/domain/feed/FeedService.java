@@ -41,12 +41,16 @@ public class FeedService {
     public Map<String, Object> getPaginatedPostIds(int cursor, int limit, Integer userId, String type) {
         Pageable pageable = PageRequest.of(0, limit);
         List<Integer> ids = getPaginatedFeed(type, userId, cursor, pageable);
-        System.out.println("Getting paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
+        System.out.println("Got paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
 
-        Integer nextCursor;
+        Integer nextCursor = null;
 
-        if (type.equals("For You") && userId != null) {
-            nextCursor = ids.get(ids.size() - 1);
+        if (ids.size() == 0) {
+            return null;
+        } else if (type.equals("For You") && userId != null) {
+            if (ids.size() > 0) {
+                nextCursor = ids.get(ids.size() - 1);
+            }
             FeedEntry feedEntry = feedEntryRepository.findByPostIdAndUserId(nextCursor, userId);
             nextCursor = feedEntry.getPosition();
         } else {
