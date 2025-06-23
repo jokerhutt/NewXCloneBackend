@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.user;
 
+import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,7 @@ public class UserController {
     @GetMapping("/getAdminUser")
     public ResponseEntity<UserDTO> getUser(@RequestParam Integer id) {
         System.out.println("Booyah " + id);
+        userService.generateFeed(id);
         return ResponseEntity.ok(userService.findUserByID(id));
     }
 

@@ -9,6 +9,7 @@ import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
@@ -29,7 +30,7 @@ public class EdgeRank {
     private final FeedEntryRepository feedEntryRepository;
 
     @Autowired
-    public EdgeRank (PostRepository postRepository, PostMediaRepository postMediaRepository, LikeRepository likeRepository, UserService userService, FeedEntryRepository feedEntryRepository) {
+    public EdgeRank (PostRepository postRepository, PostMediaRepository postMediaRepository, LikeRepository likeRepository, @Lazy UserService userService, FeedEntryRepository feedEntryRepository) {
         this.postRepository = postRepository;
         this.postMediaRepository = postMediaRepository;
         this.likeRepository = likeRepository;
@@ -39,6 +40,7 @@ public class EdgeRank {
 
     public ArrayList<PostRank> buildFeed (Integer userId) {
 
+        System.out.println(" build feed " + userId);
         ArrayList<Integer> feed = new ArrayList<>();
         UserDTO userDTO = userService.findUserByID(userId);
 
@@ -59,6 +61,12 @@ public class EdgeRank {
     }
 
     @Transactional
+    public void generateFeed (Integer userId) {
+        ArrayList<PostRank> postRanks = buildFeed(userId);
+        saveFeed(userId, postRanks);
+    }
+
+    @Transactional
     public void saveFeed(Integer userId, ArrayList<PostRank> feed) {
         feedEntryRepository.deleteByUserId(userId);
 
@@ -72,6 +80,7 @@ public class EdgeRank {
             feedEntry.setPosition(i);
             feedEntries.add(feedEntry);
         }
+        System.out.println(" Savin feed " + userId);
 
         feedEntryRepository.saveAll(feedEntries);
     }
@@ -79,11 +88,12 @@ public class EdgeRank {
 
     private void computeTotalScore (ArrayList<PostRank> postranks, UserDTO feedUser) {
         for (PostRank postRank : postranks) {
-            computeAffinity(postRank, feedUser);
-            computeWeights(postRank);
+            if (!calculateIfOwnRecentPost(postRank, feedUser)) {
+                computeAffinity(postRank, feedUser);
+                computeWeights(postRank);
+            }
             computeTimeDecayValue(postRank);
             postRank.computeTotalScore();
-            calculateIfOwnRecentPost(postRank, feedUser);
         }
     }
 
@@ -117,11 +127,14 @@ public class EdgeRank {
         }
     }
 
-    private void calculateIfOwnRecentPost (PostRank postRank, UserDTO feedUser) {
+    private boolean calculateIfOwnRecentPost (PostRank postRank, UserDTO feedUser) {
         boolean isOwnRecentPost = postRank.post.getUserId().equals(feedUser.id) && ChronoUnit.HOURS.between(postRank.post.getCreatedAt().toLocalDateTime(), LocalDateTime.now()) <= 6;
         if (isOwnRecentPost) {
-            postRank.totalScore += 9999;
+            postRank.affinity += (2000 + postRank.post.getId());
+            postRank.weight += (2000 + postRank.post.getId());
+            return true;
         }
+        return false;
     }
 
     private float computeLikeWeights (PostRank postToRank) {

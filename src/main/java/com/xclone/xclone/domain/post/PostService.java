@@ -2,11 +2,15 @@ package com.xclone.xclone.domain.post;
 
 import com.xclone.xclone.domain.bookmark.Bookmark;
 import com.xclone.xclone.domain.bookmark.BookmarkRepository;
+import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.like.Like;
 import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.notification.NotificationService;
 import com.xclone.xclone.domain.retweet.Retweet;
 import com.xclone.xclone.domain.retweet.RetweetRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,21 +24,26 @@ import java.util.*;
 @Service
 public class PostService {
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final NotificationService notificationService;
     private final RetweetRepository retweetRepository;
     private final PostMediaRepository postMediaRepository;
+    private final EdgeRank edgeRank;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.notificationService = notificationService;
         this.retweetRepository = retweetRepository;
         this.postMediaRepository = postMediaRepository;
+        this.edgeRank = edgeRank;
     }
 
     public PostDTO findPostDTOById(int id) {
@@ -194,6 +203,7 @@ public class PostService {
         return ids;
     }
 
+    @Transactional
     public Post createPostEntity(Integer userId, String text, Integer parentId) {
         Post post = new Post();
         post.setUserId(userId);
@@ -202,7 +212,13 @@ public class PostService {
             post.setParentId(parentId);
         }
 
-        return postRepository.save(post);
+        Post newPost = postRepository.save(post);
+        entityManager.refresh(newPost);
+        System.out.println(newPost.getCreatedAt());
+        if (parentId == null) {
+            edgeRank.generateFeed(newPost.getUserId());
+        }
+        return newPost;
     }
 
     public void savePostImages(Integer postId, List<MultipartFile> images) {

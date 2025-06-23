@@ -1,6 +1,8 @@
 package com.xclone.xclone.domain.user;
 
 import com.xclone.xclone.domain.bookmark.BookmarkService;
+import com.xclone.xclone.domain.feed.EdgeRank;
+import com.xclone.xclone.domain.feed.PostRank;
 import com.xclone.xclone.domain.follow.Follow;
 import com.xclone.xclone.domain.follow.FollowRepository;
 import com.xclone.xclone.domain.follow.FollowService;
@@ -36,9 +38,10 @@ public class UserService {
 
     private final RetweetService retweetService;
     private final FollowRepository followRepository;
+    private final EdgeRank edgeRank;
 
     @Autowired
-    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, RetweetService retweetService, FollowRepository followRepository) {
+    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, RetweetService retweetService, FollowRepository followRepository, EdgeRank edgeRank) {
         this.userRepository = userRepository;
         this.postService = postService;
         this.bookmarkService = bookmarkService;
@@ -46,6 +49,7 @@ public class UserService {
 
         this.retweetService = retweetService;
         this.followRepository = followRepository;
+        this.edgeRank = edgeRank;
     }
 
     private UserDTO createUserDTO(User user) {
@@ -162,16 +166,22 @@ public class UserService {
 
 
         userRepository.save(user);
+        edgeRank.generateFeed(user.getId());
         System.out.println("Saved user ID: " + user.getId());
         return this.findUserByID(user.getId());
 
     }
 
+    @Transactional
     public ResponseEntity<?> verifyUser (LoginRequest loginRequest) {
 
         User user = this.findByUserName(loginRequest.username);
         if (user != null) {
             if (loginRequest.password.equals(user.getPassword())) {
+                System.out.println("Password verified, generating feed");
+                edgeRank.generateFeed(user.getId());
+                System.out.println("Generated feed");
+
                 UserDTO dto = this.findUserByID(user.getId());
                 return ResponseEntity.ok(dto);
             } else {
@@ -185,5 +195,12 @@ public class UserService {
 
 
     }
+
+    @Transactional
+    void generateFeed(Integer userId) {
+        edgeRank.generateFeed(userId);
+    }
+
+
 
 }
