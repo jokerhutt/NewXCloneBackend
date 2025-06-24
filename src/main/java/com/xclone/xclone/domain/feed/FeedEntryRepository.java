@@ -16,12 +16,12 @@ public interface FeedEntryRepository extends JpaRepository<FeedEntry, Integer> {
     @Query("""
 SELECT f.postId
 FROM FeedEntry f
-WHERE f.userId = :userId AND f.position > :cursor
+WHERE f.userId = :userId AND f.position >= :cursor
 ORDER BY f.position ASC
 """)
     List<Integer> getFeedPostIdsCustom(
             @Param("userId") Integer userId,
-            @Param("cursor") int cursor,
+            @Param("cursor") long cursor,
             Pageable pageable
     );
 

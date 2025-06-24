@@ -20,12 +20,13 @@ public class FeedController {
     @GetMapping("/getFeedPage")
     public ResponseEntity<?> getFeedPage(
             @RequestParam String type,
-            @RequestParam(defaultValue = "0") int cursor,
+            @RequestParam(defaultValue = "0") long cursor,
             @RequestParam(required = false) Integer userId,
             @RequestParam(defaultValue = "10") int limit
     ) {
         System.out.println("Received request for type " + type + " cursor " + cursor + " limit " + limit);
-        return ResponseEntity.ok(feedService.getPaginatedPostIds(cursor, limit, userId, type));
+            return ResponseEntity.ok(feedService.getPaginatedPostIds(cursor, limit, userId, type));
+
     }
 
 }

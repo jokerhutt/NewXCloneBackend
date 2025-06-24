@@ -25,7 +25,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
 """)
     List<Integer> findPaginatedBookmarkedPostIds(
             @Param("userId") int userId,
-            @Param("cursor") int cursor,
+            @Param("cursor") long cursor,
             Pageable pageable
     );
 }

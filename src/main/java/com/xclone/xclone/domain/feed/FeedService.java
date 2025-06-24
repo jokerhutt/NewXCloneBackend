@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -38,33 +39,56 @@ public class FeedService {
         this.postMediaRepository = postMediaRepository;
     }
 
-    public Map<String, Object> getPaginatedPostIds(int cursor, int limit, Integer userId, String type) {
+    public Map<String, Object> getPaginatedPostIds(long cursor, int limit, Integer userId, String type) {
         Pageable pageable = PageRequest.of(0, limit);
-        List<Integer> ids = getPaginatedFeed(type, userId, cursor, pageable);
-        System.out.println("Got paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
 
-        Integer nextCursor = null;
+        List<Integer> ids;
+
+        if (type.equals("Tweets")) {
+            Timestamp cursorTimestamp = new Timestamp(cursor);
+            if (userId == null) throw new IllegalArgumentException("userId required for posts feed");
+            ids = postRepository.findPaginatedTweetIdsByUserIdByTime(userId, cursorTimestamp, pageable);
+        } else {
+            ids = getPaginatedFeed(type, userId, cursor, pageable);
+            System.out.println("Got paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
+        }
+
+        Long lastPostId = null;
 
         if (ids.size() == 0) {
             return null;
         } else if (type.equals("For You") && userId != null) {
             if (ids.size() > 0) {
-                nextCursor = ids.get(ids.size() - 1);
+                Integer lastPostIdInt = ids.get(ids.size() - 1);
+                FeedEntry feedEntry = feedEntryRepository.findByPostIdAndUserId(lastPostIdInt, userId);
+                lastPostId = Long.valueOf(feedEntry.getPosition());
             }
-            FeedEntry feedEntry = feedEntryRepository.findByPostIdAndUserId(nextCursor, userId);
-            nextCursor = feedEntry.getPosition();
+        } else if (type.equals("Tweets") && userId != null) {
+            Integer lastPostIdInt = ids.size() < limit ? null : ids.get(ids.size() - 1);
+            if (lastPostIdInt != null) {
+                Optional<Post> post = postRepository.findById(lastPostIdInt);
+                if (post.isPresent()) {
+                    lastPostId = post.get().getCreatedAt().getTime();
+                } else {
+                    throw new IllegalArgumentException("PostId doesn't exist");
+                }
+            } else {
+                lastPostId = null;
+            }
+
         } else {
-            nextCursor = ids.size() < limit ? null : ids.get(ids.size() - 1);
+            lastPostId = Long.valueOf(ids.size() < limit ? null : ids.get(ids.size() - 1));
+
         }
 
         Map<String, Object> response = new HashMap<>();
         response.put("posts", ids);
-        response.put("nextCursor", nextCursor);
-        System.out.println("Returned: " + Arrays.toString(ids.toArray()) + " cursor: " + nextCursor + " limit: " + limit + " user: " + userId + " type: " + type);
+        response.put("nextCursor", lastPostId);
+        System.out.println("Returned: " + Arrays.toString(ids.toArray()) + " cursor: " + lastPostId + " limit: " + limit + " user: " + userId + " type: " + type);
         return response;
     }
 
-    public List<Integer> getPaginatedFeed(String type, Integer userId, int cursor, Pageable pageable) {
+    public List<Integer> getPaginatedFeed(String type, Integer userId, long cursor, Pageable pageable) {
         switch (type.toLowerCase()) {
             case "for you":
                 return getUsersForYouFeed(userId, cursor, pageable);
@@ -76,10 +100,6 @@ public class FeedService {
             case "liked":
                 if (userId == null) throw new IllegalArgumentException("userId required for liked feed");
                 return likeRepository.findPaginatedLikedPostIds(userId, cursor, pageable);
-
-            case "tweets":
-                if (userId == null) throw new IllegalArgumentException("userId required for posts feed");
-                return postRepository.findPaginatedTweetIdsByUserId(userId, cursor, pageable);
 
             case "replies":
                 if (userId == null) throw new IllegalArgumentException("userId required for replies feed");
@@ -98,7 +118,7 @@ public class FeedService {
         }
     }
 
-    private List<Integer> getUsersForYouFeed (Integer userId, int cursor, Pageable pageable) {
+    private List<Integer> getUsersForYouFeed (Integer userId, long cursor, Pageable pageable) {
 //        printFeed(feedEntryRepository.findAllByUserId(13), 13);
 
         if (userId == null) {

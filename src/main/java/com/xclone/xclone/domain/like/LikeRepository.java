@@ -27,7 +27,7 @@ ORDER BY l.likedPostId DESC
 """)
     List<Integer> findPaginatedLikedPostIds(
             @Param("userId") int userId,
-            @Param("cursor") int cursor,
+            @Param("cursor") long cursor,
             Pageable pageable
     );
 }
