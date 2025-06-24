@@ -2,6 +2,8 @@ package com.xclone.xclone.domain.like;
 
 import jakarta.persistence.*;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "likes")
 public class Like {
@@ -19,6 +21,9 @@ public class Like {
     public Integer getId() {
         return id;
     }
+
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private Timestamp createdAt;
 
     public void setId(Integer id) {
         this.id = id;
@@ -39,4 +44,9 @@ public class Like {
     public void setLikedPostId(Integer likedPostId) {
         this.likedPostId = likedPostId;
     }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
 }

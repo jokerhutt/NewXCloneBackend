@@ -2,6 +2,8 @@ package com.xclone.xclone.domain.retweet;
 
 import jakarta.persistence.*;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table (name = "retweets")
 public class Retweet {
@@ -18,6 +20,9 @@ public class Retweet {
 
     @Column(name = "type")
     private String type;
+
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private Timestamp createdAt;
 
     public String getType() {
         return type;
@@ -50,4 +55,9 @@ public class Retweet {
     public void setRetweeterId(Integer retweeterId) {
         this.retweeterId = retweeterId;
     }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
 }

@@ -2,6 +2,8 @@ package com.xclone.xclone.domain.bookmark;
 
 import jakarta.persistence.*;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table (name = "bookmarks")
 public class Bookmark {
@@ -15,6 +17,9 @@ public class Bookmark {
 
     @Column(name = "bookmarked_post")
     private Integer bookmarkedPost;
+
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private Timestamp createdAt;
 
     public Integer getId() {
         return id;
@@ -38,5 +43,9 @@ public class Bookmark {
 
     public void setBookmarkedPost(Integer bookmarkedPost) {
         this.bookmarkedPost = bookmarkedPost;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 }
