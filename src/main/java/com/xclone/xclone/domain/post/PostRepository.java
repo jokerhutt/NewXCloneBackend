@@ -35,7 +35,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     """)
     List<Integer> findPaginatedTweetAndRetweetIdsByUserId(
             @Param("userId") int userId,
-            @Param("cursor") int cursor,
+            @Param("cursor") Timestamp cursor,
             Pageable pageable
     );
 
@@ -53,8 +53,15 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             Pageable pageable
     );
 
-    @Query("SELECT p.id FROM Post p WHERE p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
-    List<Integer> findNextPaginatedPostIds(@Param("cursor") long cursor, Pageable pageable);
+
+
+        @Query("""
+    SELECT p.id
+    FROM Post p
+    WHERE p.parentId IS NULL AND p.createdAt < :cursor
+    ORDER BY p.createdAt DESC
+    """)
+    List<Integer> findNextPaginatedPostIdsByTime(@Param("cursor") Timestamp cursor, Pageable pageable);
 
     @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Integer> findPaginatedTweetIdsByUserId(@Param("userId") int userId, @Param("cursor") long cursor, Pageable pageable);
@@ -62,12 +69,33 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT p FROM Post p WHERE p.userId = :userId AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
     List<Post> findPaginatedTweetsByUserId(@Param("userId") int userId, @Param("cursor") long cursor, Pageable pageable);
 
-    @Query("SELECT p.id FROM Post p WHERE p.userId = :userId AND p.parentId IS NOT NULL AND p.id < :cursor ORDER BY p.id DESC")
-    List<Integer> findPaginatedReplyIdsByUserId(@Param("userId") int userId, @Param("cursor") long cursor, Pageable pageable);
+    @Query("""
+SELECT p.id
+FROM Post p
+WHERE p.userId = :userId
+  AND p.parentId IS NOT NULL
+  AND p.createdAt < :cursor
+ORDER BY p.createdAt DESC
+""")
+    List<Integer> findPaginatedReplyIdsByUserIdByTime(
+            @Param("userId") int userId,
+            @Param("cursor") Timestamp cursor,
+            Pageable pageable
+    );
 
-    @Query("SELECT p.id FROM Post p WHERE p.userId IN :followedUserIds AND p.parentId IS NULL AND p.id < :cursor ORDER BY p.id DESC")
-    List<Integer> findPaginatedPostIdsFromFollowedUsers(@Param("followedUserIds") List<Integer> followedUserIds, @Param("cursor") long cursor, Pageable pageable);
-
+    @Query("""
+SELECT p.id
+FROM Post p
+WHERE p.userId IN :followedUserIds
+  AND p.parentId IS NULL
+  AND p.createdAt < :cursor
+ORDER BY p.createdAt DESC
+""")
+    List<Integer> findPaginatedPostIdsFromFollowedUsersByTime(
+            @Param("followedUserIds") List<Integer> followedUserIds,
+            @Param("cursor") Timestamp cursor,
+            Pageable pageable
+    );
     @Query("SELECT p.id FROM Post p")
     Page<Integer> findAllPostIds(Pageable pageable);
 
@@ -78,17 +106,18 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     List<Post> findAllTopLevelPosts();
 
     @Query("""
-    SELECT p.id FROM Post p
-    WHERE p.userId = :userId
-      AND p.id < :cursor
-      AND p.id IN (
-        SELECT DISTINCT pm.postId FROM PostMedia pm
-      )
-    ORDER BY p.id DESC
+SELECT p.id
+FROM Post p
+WHERE p.userId = :userId
+  AND p.createdAt < :cursor
+  AND EXISTS (
+    SELECT 1 FROM PostMedia pm WHERE pm.postId = p.id
+  )
+ORDER BY p.createdAt DESC
 """)
-    List<Integer> findPaginatedPostIdsWithMediaByUserId(
+    List<Integer> findPaginatedPostIdsWithMediaByUserIdByTime(
             @Param("userId") int userId,
-            @Param("cursor") long cursor,
+            @Param("cursor") Timestamp cursor,
             Pageable pageable
     );
 

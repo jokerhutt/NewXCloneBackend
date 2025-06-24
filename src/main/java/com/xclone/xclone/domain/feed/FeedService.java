@@ -43,15 +43,8 @@ public class FeedService {
         Pageable pageable = PageRequest.of(0, limit);
 
         List<Integer> ids;
-
-        if (type.equals("Tweets")) {
-            Timestamp cursorTimestamp = new Timestamp(cursor);
-            if (userId == null) throw new IllegalArgumentException("userId required for posts feed");
-            ids = postRepository.findPaginatedTweetIdsByUserIdByTime(userId, cursorTimestamp, pageable);
-        } else {
-            ids = getPaginatedFeed(type, userId, cursor, pageable);
-            System.out.println("Got paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
-        }
+        ids = getPaginatedFeed(type, userId, cursor, pageable);
+        System.out.println("Got paginated post ids: " + ids + " size: " + ids.size() + " cursor: " + cursor + " limit: " + limit + " user: " + userId + " type: " + type);
 
         Long lastPostId = null;
 
@@ -63,21 +56,16 @@ public class FeedService {
                 FeedEntry feedEntry = feedEntryRepository.findByPostIdAndUserId(lastPostIdInt, userId);
                 lastPostId = Long.valueOf(feedEntry.getPosition());
             }
-        } else if (type.equals("Tweets") && userId != null) {
+        } else {
             Integer lastPostIdInt = ids.size() < limit ? null : ids.get(ids.size() - 1);
-            if (lastPostIdInt != null) {
+            if (lastPostIdInt != null && userId != null) {
                 Optional<Post> post = postRepository.findById(lastPostIdInt);
                 if (post.isPresent()) {
                     lastPostId = post.get().getCreatedAt().getTime();
                 } else {
                     throw new IllegalArgumentException("PostId doesn't exist");
                 }
-            } else {
-                lastPostId = null;
             }
-
-        } else {
-            lastPostId = Long.valueOf(ids.size() < limit ? null : ids.get(ids.size() - 1));
 
         }
 
@@ -89,29 +77,36 @@ public class FeedService {
     }
 
     public List<Integer> getPaginatedFeed(String type, Integer userId, long cursor, Pageable pageable) {
+
+        Timestamp cursorTimestamp = new Timestamp(cursor);
+
         switch (type.toLowerCase()) {
             case "for you":
                 return getUsersForYouFeed(userId, cursor, pageable);
 
             case "following":
                 UserDTO user = userService.findUserByID(userId);
-                return postRepository.findPaginatedPostIdsFromFollowedUsers(user.following, cursor, pageable);
+                return postRepository.findPaginatedPostIdsFromFollowedUsersByTime(user.following, cursorTimestamp, pageable);
+
+            case "tweets":
+                if (userId == null) throw new IllegalArgumentException("userId required for tweets feed");
+                return postRepository.findPaginatedTweetIdsByUserIdByTime(userId, cursorTimestamp, pageable);
 
             case "liked":
                 if (userId == null) throw new IllegalArgumentException("userId required for liked feed");
-                return likeRepository.findPaginatedLikedPostIds(userId, cursor, pageable);
+                return likeRepository.findPaginatedLikedPostIdsByTime(userId, cursorTimestamp, pageable);
 
             case "replies":
                 if (userId == null) throw new IllegalArgumentException("userId required for replies feed");
-                return postRepository.findPaginatedReplyIdsByUserId(userId, cursor, pageable);
+                return postRepository.findPaginatedReplyIdsByUserIdByTime(userId, cursorTimestamp, pageable);
 
             case "bookmarks":
                 if (userId == null) throw new IllegalArgumentException("userId required for bookmarks feed");
-                return bookmarkRepository.findPaginatedBookmarkedPostIds(userId, cursor, pageable);
+                return bookmarkRepository.findPaginatedBookmarkedPostIdsByTime(userId, cursorTimestamp, pageable);
 
             case "media":
                 if (userId == null) throw new IllegalArgumentException("userId required for media feed");
-                return postRepository.findPaginatedPostIdsWithMediaByUserId(userId, cursor, pageable);
+                return postRepository.findPaginatedPostIdsWithMediaByUserIdByTime(userId, cursorTimestamp, pageable);
 
             default:
                 throw new IllegalArgumentException("Unknown feed type: " + type);
@@ -123,7 +118,8 @@ public class FeedService {
 
         if (userId == null) {
             System.out.println("userId required for you feed, getting generic");
-            return postRepository.findNextPaginatedPostIds(cursor, pageable);
+            Timestamp cursorTimestamp = new Timestamp(cursor);
+            return postRepository.findNextPaginatedPostIdsByTime(cursorTimestamp, pageable);
         } else {
 
             List<Integer> ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.awt.print.Book;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,13 +22,14 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
     @Query("""
 SELECT l.likedPostId
 FROM Like l
+JOIN Post p ON l.likedPostId = p.id
 WHERE l.likerId = :userId
-  AND l.likedPostId < :cursor
-ORDER BY l.likedPostId DESC
+  AND l.createdAt < :cursor
+ORDER BY l.createdAt DESC
 """)
-    List<Integer> findPaginatedLikedPostIds(
+    List<Integer> findPaginatedLikedPostIdsByTime(
             @Param("userId") int userId,
-            @Param("cursor") long cursor,
+            @Param("cursor") Timestamp cursor,
             Pageable pageable
     );
 }
