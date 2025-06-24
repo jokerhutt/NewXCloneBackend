@@ -48,8 +48,8 @@ public class FeedService {
 
         Long lastPostId = null;
 
-        if (ids.size() == 0) {
-            return null;
+        if (ids.isEmpty()) {
+            lastPostId = null;
         } else if (type.equals("For You") && userId != null) {
             if (ids.size() > 0) {
                 Integer lastPostIdInt = ids.get(ids.size() - 1);
@@ -130,6 +130,7 @@ public class FeedService {
                 edgeRank.saveFeed(userId, postRanks);
                 ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
             }
+
             System.out.println("to return ids is: " + ids);
             return ids;
         }
