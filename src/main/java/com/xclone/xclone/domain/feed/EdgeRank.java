@@ -122,7 +122,7 @@ public class EdgeRank {
     private double computeTimeDecay(Post post) {
         LocalDateTime createdAt = post.getCreatedAt().toLocalDateTime();
         long hoursSince = ChronoUnit.HOURS.between(createdAt, LocalDateTime.now());
-        return 1.0 / (hoursSince + 1);
+        return 1.0 / (hoursSince + 2);
     }
 
     private float computeFollowingAffinity (UserDTO feedUser, Integer postOwnerId) {
