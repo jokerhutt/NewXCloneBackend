@@ -2,7 +2,6 @@ package com.xclone.xclone.domain.auth;
 
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
-import com.xclone.xclone.domain.user.UserRepository;
 import com.xclone.xclone.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -27,4 +26,12 @@ public class AuthController {
         UserDTO dtoToReturn = userService.findUserByID(authenticatedUser.getId());
         return ResponseEntity.ok(dtoToReturn);
     }
+
+    @PostMapping("/tempSignup")
+    public ResponseEntity<?> authenticateWithTempSignup() {
+        User newTempuser = authService.registerTemporaryUser();
+        UserDTO dtoToReturn = userService.findUserByID(newTempuser.getId());
+        return ResponseEntity.ok(dtoToReturn);
+    }
+
 }

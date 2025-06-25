@@ -3,6 +3,7 @@ package com.xclone.xclone.domain.auth;
 import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,10 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+
+import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.DEFAULT_ADJECTIVES;
+import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.DEFAULT_ANIMALS;
 
 @Service
 public class AuthService {
@@ -28,14 +33,34 @@ public class AuthService {
         this.edgeRank = edgeRank;
     }
 
+    @Transactional
     public User registerTemporaryUser () {
 
         //TODO make sure this never collides, maybe keep trying until a unique one??
-        User user = new User();
+        User newUser = new User();
 
+        Random random = new Random();
+
+        String firstName = DEFAULT_ADJECTIVES[random.nextInt(DEFAULT_ADJECTIVES.length)];
+        String lastName = DEFAULT_ANIMALS[random.nextInt(DEFAULT_ANIMALS.length)];
+
+        int suffix = random.nextInt(90000) + 10000;
+        String username = "anonymous" + suffix;
+
+        newUser.setDisplayName(firstName + " " + lastName);
+        newUser.setUsername(username);
+        newUser.setEmail(username + "@gmail.com");
+        newUser.setCreatedAt(Timestamp.from(Instant.now()));
+        newUser.setProfilePicture(parseDefaultImage("static/assets/defaultPFP.png"));
+        newUser.setBannerImage(parseDefaultImage("static/assets/defaultBanner.jpg"));
+
+        userRepository.save(newUser);
+        edgeRank.generateFeed(newUser.getId());
+        return newUser;
 
     }
 
+    @Transactional
     public User authenticateGoogleUser (String accessToken) {
 
         Map userInfo = parseGoogleUserInfo(accessToken);
@@ -55,7 +80,8 @@ public class AuthService {
         }
     }
 
-    private User createNewGoogleUser (Map userInfo) {
+    @Transactional
+    public User createNewGoogleUser (Map userInfo) {
 
         String googleId = (String) userInfo.get("sub");
         String email = (String) userInfo.get("email");
@@ -75,7 +101,7 @@ public class AuthService {
         newUser.setCreatedAt(Timestamp.from(Instant.now()));
 
         newUser.setProfilePicture(parseGoogleImageToByte(pictureUrl));
-        newUser.setBannerImage(parseDefaultBannerImage("static/assets/defaultBanner.jpg"));
+        newUser.setBannerImage(parseDefaultImage("static/assets/defaultBanner.jpg"));
 
         userRepository.save(newUser);
         edgeRank.generateFeed(newUser.getId());
@@ -124,7 +150,7 @@ public class AuthService {
         }
     }
 
-    public byte[] parseDefaultBannerImage (String bannerPath) {
+    public byte[] parseDefaultImage (String bannerPath) {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(bannerPath)) {
             if (in == null) throw new RuntimeException("default banner not found");
             return in.readAllBytes();
