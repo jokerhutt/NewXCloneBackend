@@ -216,12 +216,9 @@ public class PostService {
 
         Post newPost = postRepository.save(post);
 
+
+        //TODO should remove?
         entityManager.refresh(newPost);
-
-        System.out.println("Saved, new post id is: " + newPost.getUserId());
-
-
-        System.out.println("Newpost created at: " + newPost.getCreatedAt());
         if (parentId == null) {
             edgeRank.generateFeed(newPost.getUserId());
         }

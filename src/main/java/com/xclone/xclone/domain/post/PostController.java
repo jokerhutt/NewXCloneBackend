@@ -93,7 +93,7 @@ public class PostController {
             notificationService.createNotificationFromType(userId, post.getId(), "reply");
         }
 
-        return ResponseEntity.ok(Map.of("message", "Post created successfully"));
+        return ResponseEntity.ok(postService.findPostDTOById(post.getId()));
     }
 
 }
