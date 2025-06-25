@@ -212,9 +212,16 @@ public class PostService {
             post.setParentId(parentId);
         }
 
+        System.out.println("Saving post by: " + userId);
+
         Post newPost = postRepository.save(post);
+
         entityManager.refresh(newPost);
-        System.out.println(newPost.getCreatedAt());
+
+        System.out.println("Saved, new post id is: " + newPost.getUserId());
+
+
+        System.out.println("Newpost created at: " + newPost.getCreatedAt());
         if (parentId == null) {
             edgeRank.generateFeed(newPost.getUserId());
         }

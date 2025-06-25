@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -65,6 +66,19 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserByID(id));
     }
 
+    @GetMapping("/searchUsers")
+    public List<Integer> searchUsers(@RequestParam String q) {
+        return userService.searchUsersByName(q);
+    }
+
+    @GetMapping("/getDiscoverFeed")
+    public ResponseEntity<?> getFeedPage(
+            @RequestParam(defaultValue = "0") long cursor,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        System.out.println("Received request for cursor: " + cursor + " limit " + limit);
+        return ResponseEntity.ok(userService.getPaginatedTopUsers(cursor, limit));
+    }
 
 
 

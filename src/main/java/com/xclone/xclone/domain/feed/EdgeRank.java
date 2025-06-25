@@ -62,7 +62,10 @@ public class EdgeRank {
 
     @Transactional
     public void generateFeed (Integer userId) {
+        System.out.println(" generateFeed in edgerank for: " + userId);
         ArrayList<PostRank> postRanks = buildFeed(userId);
+        System.out.println(" postRanks size: " + postRanks.size());
+        System.out.println(" postRanks: " + postRanks);
         saveFeed(userId, postRanks);
     }
 

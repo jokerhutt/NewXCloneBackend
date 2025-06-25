@@ -1,7 +1,11 @@
 package com.xclone.xclone.domain.user;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
@@ -11,4 +15,24 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsUserByEmail(String email);
 
     boolean existsUserByUsername(String username);
+
+    @Query("""
+    SELECT u FROM User u
+    WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%'))
+       OR LOWER(u.displayName) LIKE LOWER(CONCAT('%', :query, '%'))
+    """)
+    List<User> searchByUsernameOrDisplayName(@Param("query") String query);
+
+    @Query(value = """
+      SELECT u.id
+      FROM users u
+      LEFT JOIN follows f ON f.followed_id = u.id
+      GROUP BY u.id
+      HAVING COUNT(f.follower_id) < :cursor
+      ORDER BY COUNT(f.follower_id) DESC
+      LIMIT :limit
+  """, nativeQuery = true)
+    List<Integer> findUserIdsByFollowerCount(@Param("cursor") long cursor, @Param("limit") int limit);
+
+    Optional<User> findByGoogleId(String googleId);
 }

@@ -15,8 +15,12 @@ public class User {
     @Column(nullable = false, unique = true, length = 64, name = "name")
     private String username;
 
-    @Column(nullable = false, length = 400)
+    @Column(length = 400)
     private String password;
+
+    @Column(name = "google_id", unique = true)
+    private String googleId;
+
 
     @Column(nullable = false, unique = true, length = 45)
     private String email;
@@ -38,6 +42,14 @@ public class User {
     @Column(nullable = false)
     private java.sql.Timestamp createdAt;
 
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
 
     public Integer getId() {
         return id;

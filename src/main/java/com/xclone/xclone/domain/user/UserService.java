@@ -21,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -105,8 +102,39 @@ public class UserService {
 
     }
 
+    public Map<String, Object> getPaginatedTopUsers(Long cursor, int limit) {
+        List<Integer> userIds = userRepository.findUserIdsByFollowerCount(cursor, limit);
 
-//            this.profilePicture = Base64.getEncoder().encodeToString(user.getProfilePicture());
+        System.out.println("Got paginated user ids: " + userIds + " size: " + userIds.size());
+
+        Long nextCursor = null;
+
+        if (!userIds.isEmpty()) {
+            Integer lastUserId = userIds.get(userIds.size() - 1);
+            UserDTO lastUser = findUserByID(lastUserId);
+            nextCursor = (long) lastUser.followers.size();
+        }
+
+        System.out.println("nextCursor: " + nextCursor);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", userIds);
+        response.put("nextCursor", nextCursor);
+
+        return response;
+    }
+
+    public List<Integer> searchUsersByName(String query) {
+        List<User> userList = userRepository.searchByUsernameOrDisplayName(query);
+        ArrayList<Integer> userIds = new ArrayList<>();
+        for (User user : userList) {
+            userIds.add(user.getId());
+        }
+        return userIds;
+    }
+
+
+//        this.profilePicture = Base64.getEncoder().encodeToString(user.getProfilePicture());
 //        this.bannerImage = Base64.getEncoder().encodeToString(user.getBannerImage());
 
     public ArrayList<UserDTO> findAllUserDTOByIds( ArrayList<Integer> ids) {
