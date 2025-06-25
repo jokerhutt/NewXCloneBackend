@@ -216,12 +216,6 @@ public class PostService {
 
         Post newPost = postRepository.save(post);
 
-
-        //TODO should remove?
-        entityManager.refresh(newPost);
-        if (parentId == null) {
-            edgeRank.generateFeed(newPost.getUserId());
-        }
         return newPost;
     }
 

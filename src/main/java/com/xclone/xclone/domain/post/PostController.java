@@ -43,8 +43,6 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPostMediaByPostId(ids));
     }
 
-
-
     //TODO cleanup
     @GetMapping("/getPostMediaById")
     public ResponseEntity<?> getPostMedia(@RequestParam Integer id) {
@@ -57,14 +55,6 @@ public class PostController {
 
         return ResponseEntity.ok(encodedPostMedia);
     }
-
-//    @GetMapping("/getFeedPage")
-//    public ResponseEntity<?> getFeedPage(
-//            @RequestParam(defaultValue = "0") int cursor,
-//            @RequestParam(defaultValue = "10") int limit
-//    ) {
-//        return ResponseEntity.ok(postService.getPaginatedPostDTOs(cursor, limit));
-//    }
 
     @GetMapping("/getSinglePost/{id}")
     public ResponseEntity<?> getSinglePost(@PathVariable Integer id) {
