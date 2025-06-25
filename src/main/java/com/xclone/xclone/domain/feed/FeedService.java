@@ -9,7 +9,6 @@ import com.xclone.xclone.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -85,7 +84,7 @@ public class FeedService {
                 return getUsersForYouFeed(userId, cursor, pageable);
 
             case "following":
-                UserDTO user = userService.findUserByID(userId);
+                UserDTO user = userService.generateUserDTOByUserId(userId);
                 return postRepository.findPaginatedPostIdsFromFollowedUsersByTime(user.following, cursorTimestamp, pageable);
 
             case "tweets":
@@ -138,7 +137,7 @@ public class FeedService {
 
     private void printFeed(List<FeedEntry> feedEntries, Integer userId) {
 
-        UserDTO user = userService.findUserByID(userId);
+        UserDTO user = userService.generateUserDTOByUserId(userId);
 
         System.out.println("GENERATED FEED FOR USER: " + user.username);
         System.out.println("--------------------------------------------------------------");

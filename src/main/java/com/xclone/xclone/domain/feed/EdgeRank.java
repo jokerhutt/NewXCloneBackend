@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class EdgeRank {
 
         System.out.println(" build feed " + userId);
         ArrayList<Integer> feed = new ArrayList<>();
-        UserDTO userDTO = userService.findUserByID(userId);
+        UserDTO userDTO = userService.generateUserDTOByUserId(userId);
 
         List<Post> posts = postRepository.findAllTopLevelPosts();
         ArrayList<PostRank> postRanks = new ArrayList<>();

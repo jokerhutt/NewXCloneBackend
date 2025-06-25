@@ -23,14 +23,14 @@ public class AuthController {
     public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> body) {
         String accessToken = body.get("token");
         User authenticatedUser = authService.authenticateGoogleUser(accessToken);
-        UserDTO dtoToReturn = userService.findUserByID(authenticatedUser.getId());
+        UserDTO dtoToReturn = userService.generateUserDTOByUserId(authenticatedUser.getId());
         return ResponseEntity.ok(dtoToReturn);
     }
 
     @PostMapping("/tempSignup")
     public ResponseEntity<?> authenticateWithTempSignup() {
         User newTempuser = authService.registerTemporaryUser();
-        UserDTO dtoToReturn = userService.findUserByID(newTempuser.getId());
+        UserDTO dtoToReturn = userService.generateUserDTOByUserId(newTempuser.getId());
         return ResponseEntity.ok(dtoToReturn);
     }
 

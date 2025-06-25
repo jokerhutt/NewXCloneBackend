@@ -60,7 +60,7 @@ public class FollowService {
         followRepository.save(follow);
         notificationService.createNotificationFromType(followerId, followedId, "follow");
 
-        return userService.findUserByID(followedId);
+        return userService.generateUserDTOByUserId(followedId);
 
 
     }
@@ -71,7 +71,7 @@ public class FollowService {
         if (toDeleteFollow.isPresent()) {
             followRepository.delete(toDeleteFollow.get());
             notificationService.deleteNotificationFromType(followerId, followedId, "follow");
-            return userService.findUserByID(followedId);
+            return userService.generateUserDTOByUserId(followedId);
         } else {
             throw new IllegalStateException("Follow does not exist");
         }

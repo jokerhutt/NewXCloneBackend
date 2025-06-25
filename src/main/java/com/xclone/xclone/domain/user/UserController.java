@@ -1,15 +1,12 @@
 package com.xclone.xclone.domain.user;
 
-import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,15 +20,14 @@ public class UserController {
         this.postService = postService;
     }
 
+    @GetMapping("/getUser")
+    public ResponseEntity<?> getUserById(@RequestParam Integer id) {
+        return ResponseEntity.ok(userService.generateUserDTOByUserId(id));
+    }
+
     @PostMapping("/getUsers")
     public ResponseEntity<?> getUsers(@RequestBody ArrayList<Integer> ids) {
         return ResponseEntity.ok(userService.findAllUserDTOByIds(ids));
-
-    }
-
-    @GetMapping("/getUser")
-    public ResponseEntity<?> getUserById(@RequestParam Integer id) {
-        return ResponseEntity.ok(userService.findUserByID(id));
     }
 
     @GetMapping("/getProfilePic")
@@ -49,7 +45,7 @@ public class UserController {
     public ResponseEntity<UserDTO> getUser(@RequestParam Integer id) {
         System.out.println("Booyah " + id);
         userService.generateFeed(id);
-        return ResponseEntity.ok(userService.findUserByID(id));
+        return ResponseEntity.ok(userService.generateUserDTOByUserId(id));
     }
 
     @GetMapping("/searchUsers")
