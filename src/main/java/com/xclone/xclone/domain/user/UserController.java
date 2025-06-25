@@ -45,20 +45,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserProfileMedia(id, "bannerImage"));
     }
 
-
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody User signupUser) {
-
-        UserDTO newUser = userService.registerUser(signupUser);
-        return ResponseEntity.ok(newUser);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        System.out.println(loginRequest.username);
-        return userService.verifyUser(loginRequest);
-    }
-
     @GetMapping("/getAdminUser")
     public ResponseEntity<UserDTO> getUser(@RequestParam Integer id) {
         System.out.println("Booyah " + id);
