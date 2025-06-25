@@ -125,7 +125,7 @@ public class FeedService {
             System.out.println("Old ids is: " + ids);
 
             if (ids.isEmpty()) {
-                ArrayList<PostRank> postRanks = edgeRank.buildFeed(userId);
+                ArrayList<PostRank> postRanks = edgeRank.buildAndGetNewFeed(userId);
                 edgeRank.saveFeed(userId, postRanks);
                 ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
             }

@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.xclone.xclone.util.EdgeRankUtils.generateFeedEntriesList;
+import static com.xclone.xclone.util.EdgeRankUtils.generatePostRankList;
+
 @Service
 public class EdgeRank {
 
@@ -37,55 +40,26 @@ public class EdgeRank {
         this.feedEntryRepository = feedEntryRepository;
     }
 
-    public ArrayList<PostRank> buildFeed (Integer userId) {
-
-        System.out.println(" build feed " + userId);
-        ArrayList<Integer> feed = new ArrayList<>();
+    public ArrayList<PostRank> buildAndGetNewFeed(Integer userId) {
         UserDTO userDTO = userService.generateUserDTOByUserId(userId);
-
         List<Post> posts = postRepository.findAllTopLevelPosts();
-        ArrayList<PostRank> postRanks = new ArrayList<>();
-
-        for (Post post : posts) {
-            postRanks.add(new PostRank(post));
-        }
-
+        ArrayList<PostRank> postRanks = generatePostRankList(posts);
         computeTotalScore(postRanks, userDTO);
-
-
         postRanks.sort((a, b) -> Double.compare(b.totalScore, a.totalScore));
         return postRanks;
-
-
     }
 
     @Transactional
     public void generateFeed (Integer userId) {
-        System.out.println(" generateFeed in edgerank for: " + userId);
-        ArrayList<PostRank> postRanks = buildFeed(userId);
-        System.out.println(" postRanks size: " + postRanks.size());
-        System.out.println(" postRanks: " + postRanks);
+        ArrayList<PostRank> postRanks = buildAndGetNewFeed(userId);
         saveFeed(userId, postRanks);
     }
 
     @Transactional
     public void saveFeed(Integer userId, ArrayList<PostRank> feed) {
         feedEntryRepository.deleteByUserId(userId);
-
-        ArrayList<FeedEntry> feedEntries = new ArrayList<>();
-        for (int i = 0; i < feed.size(); i++) {
-            PostRank pr = feed.get(i);
-            FeedEntry feedEntry = new FeedEntry();
-            feedEntry.setUserId(userId);
-            feedEntry.setPostId(pr.post.getId());
-            feedEntry.setScore(pr.totalScore);
-            feedEntry.setPosition(i);
-            feedEntries.add(feedEntry);
-        }
-        System.out.println(" Savin feed " + userId);
-
+        ArrayList<FeedEntry> feedEntries = generateFeedEntriesList(userId, feed);
         feedEntryRepository.saveAll(feedEntries);
-
     }
 
 
