@@ -20,6 +20,7 @@ import java.util.Random;
 
 import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.DEFAULT_ADJECTIVES;
 import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.DEFAULT_ANIMALS;
+import static com.xclone.xclone.util.UserIdentityUtils.*;
 
 @Service
 public class AuthService {
@@ -110,54 +111,6 @@ public class AuthService {
 
     }
 
-    private String parseGoogleDisplayName (String firstName, String lastName, int suffix) {
-        if (firstName != null && !firstName.isBlank()) {
-            if (lastName != null && !lastName.isBlank()) {
-                return (firstName + " " + lastName);
-            } else {
-                return firstName;
-            }
-        } else {
-            return ("tempAccount" + suffix);
-        }
-    }
-
-    private String parseGoogleUserName (String firstName, String lastName, int suffix) {
-        String baseName = (firstName != null && !firstName.isBlank()) ? firstName.toLowerCase() : "user";
-        return baseName + suffix;
-    }
-
-    private Map parseGoogleUserInfo (String accessToken) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        String googleUserInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        HttpEntity<?> request = new HttpEntity<>(headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(googleUserInfoUrl, HttpMethod.GET, request, Map.class);
-        return response.getBody();
-
-    }
-
-    public byte[] parseGoogleImageToByte (String pictureUrl) {
-        try (InputStream in = new URL(pictureUrl).openStream()) {
-            byte[] profileBytes = in.readAllBytes();
-            return profileBytes;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load Google profile picture", e);
-        }
-    }
-
-    public byte[] parseDefaultImage (String bannerPath) {
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream(bannerPath)) {
-            if (in == null) throw new RuntimeException("default banner not found");
-            return in.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load default banner image", e);
-        }
-    }
 
 
 
