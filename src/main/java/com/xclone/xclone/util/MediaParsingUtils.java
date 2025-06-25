@@ -15,6 +15,7 @@ public class MediaParsingUtils {
             String bannerImage = Base64.getEncoder().encodeToString(user.getBannerImage());
             return bannerImage;
         }
+        return null;
     }
 
 
