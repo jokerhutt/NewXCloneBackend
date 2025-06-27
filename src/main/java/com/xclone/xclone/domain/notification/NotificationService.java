@@ -11,21 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class NotificationService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+
     private NotificationRepository notificationRepository;
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository, PostRepository postRepository, UserRepository userRepository) {
+    public NotificationService(NotificationRepository notificationRepository, PostRepository postRepository) {
         this.notificationRepository = notificationRepository;
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -163,6 +164,26 @@ public class NotificationService {
     public Notification getFollowNotification (Integer followerId, Integer followingId, String type) {
         Notification notification = notificationRepository.findBySenderIdAndReceiverIdAndTypeAndReferenceId(followerId, followingId, type, followerId);
         return notification;
+    }
+
+    public ArrayList<NotificationDTO> findAllNotificationDTOsById (ArrayList<Integer> ids) {
+        List<Notification> notifications = notificationRepository.findAllById(ids);
+        ArrayList<NotificationDTO> notificationDTOs = new ArrayList<>();
+        for (Notification notification : notifications) {
+            notificationDTOs.add(new NotificationDTO(notification));
+        }
+        return notificationDTOs;
+    }
+
+    @Transactional
+    public List<Integer> getUsersUnseenIds (Integer receiverId) {
+        System.out.println("Getting and refreshing unseen ids");
+        List<Integer> unseenIds = notificationRepository.findUnseenNotificationIds(receiverId);
+        System.out.println("unseen size is" + unseenIds.size());
+        notificationRepository.markAllAsSeen(receiverId);
+        System.out.println("after marking unseen size is" + unseenIds.size());
+
+        return  unseenIds;
     }
 
     public ArrayList<NotificationDTO> getUsersNotifications (Integer userId) {

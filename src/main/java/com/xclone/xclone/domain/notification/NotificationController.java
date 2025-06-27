@@ -24,10 +24,11 @@ public class NotificationController {
         }
     }
 
-    @GetMapping("/markAsSeen/{id}")
-    public ResponseEntity<?> markAllNotificationsAsSeen(@PathVariable Integer id) {
-        notificationService.markAllReceiverNotificationsAsSeen(id);
-        return ResponseEntity.ok("SUCCESS");
+    @GetMapping("/unseenIds/{id}")
+    public ResponseEntity<?> getUsersInseenNotifications(@PathVariable Integer id) {
+        System.out.println("Getting notifications for " + id);
+
+        return ResponseEntity.ok(notificationService.getUsersUnseenIds(id));
     }
 
     @GetMapping("/getAllNotifications/{receiverId}")
@@ -35,6 +36,12 @@ public class NotificationController {
         ArrayList<NotificationDTO> toReturn = notificationService.getUsersNotifications(receiverId);
         System.out.println(toReturn.size());
         return ResponseEntity.ok(toReturn);
+    }
+
+    @PostMapping("/getNotifications")
+    public ResponseEntity<?> getNotifications(@RequestBody ArrayList<Integer> ids) {
+        System.out.println("Received request to retrieve notifications");
+        return ResponseEntity.ok(notificationService.findAllNotificationDTOsById(ids));
     }
 
 }

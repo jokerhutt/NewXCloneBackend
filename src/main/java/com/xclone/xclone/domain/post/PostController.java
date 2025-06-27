@@ -35,7 +35,6 @@ public class PostController {
     public ResponseEntity<?> getPost(@RequestBody ArrayList<Integer> ids) {
         System.out.println("Received request to retrieve posts");
         return ResponseEntity.ok(postService.findAllPostDTOByIds(ids));
-
     }
 
     @GetMapping("/getAllPostMediaByPostId")

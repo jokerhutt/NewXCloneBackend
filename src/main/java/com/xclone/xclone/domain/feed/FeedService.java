@@ -2,6 +2,8 @@ package com.xclone.xclone.domain.feed;
 
 import com.xclone.xclone.domain.bookmark.BookmarkRepository;
 import com.xclone.xclone.domain.like.LikeRepository;
+import com.xclone.xclone.domain.notification.Notification;
+import com.xclone.xclone.domain.notification.NotificationRepository;
 import com.xclone.xclone.domain.post.*;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserRepository;
@@ -24,10 +26,11 @@ public class FeedService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final PostMediaRepository postMediaRepository;
+    private final NotificationRepository notificationRepository;
     PostRepository postRepository;
 
     @Autowired
-    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, FeedEntryRepository feedEntryRepository, EdgeRank edgeRank, UserRepository userRepository, UserService userService, PostMediaRepository postMediaRepository) {
+    public FeedService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, FeedEntryRepository feedEntryRepository, EdgeRank edgeRank, UserRepository userRepository, UserService userService, PostMediaRepository postMediaRepository, NotificationRepository notificationRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
@@ -36,6 +39,7 @@ public class FeedService {
         this.userRepository = userRepository;
         this.userService = userService;
         this.postMediaRepository = postMediaRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     public Map<String, Object> getPaginatedPostIds(long cursor, int limit, Integer userId, String type) {
@@ -58,11 +62,21 @@ public class FeedService {
         } else {
             Integer lastPostIdInt = ids.size() < limit ? null : ids.get(ids.size() - 1);
             if (lastPostIdInt != null && userId != null) {
-                Optional<Post> post = postRepository.findById(lastPostIdInt);
-                if (post.isPresent()) {
-                    lastPostId = post.get().getCreatedAt().getTime();
+                if (type.equals("Notifications")) {
+
+                    Optional<Notification> notification = notificationRepository.findById(lastPostIdInt);
+                    if (notification.isPresent()) {
+                        lastPostId = notification.get().getCreatedAt().getTime();
+                    } else {
+                        throw new IllegalArgumentException("NotificationId doesn't exist");
+                    }
                 } else {
-                    throw new IllegalArgumentException("PostId doesn't exist");
+                    Optional<Post> post = postRepository.findById(lastPostIdInt);
+                    if (post.isPresent()) {
+                        lastPostId = post.get().getCreatedAt().getTime();
+                    } else {
+                        throw new IllegalArgumentException("PostId doesn't exist");
+                    }
                 }
             }
 
@@ -107,30 +121,41 @@ public class FeedService {
                 if (userId == null) throw new IllegalArgumentException("userId required for media feed");
                 return postRepository.findPaginatedPostIdsWithMediaByUserIdByTime(userId, cursorTimestamp, pageable);
 
+            case "notifications":
+                if (userId == null) throw new IllegalArgumentException("userId required for notifications feed");
+                return notificationRepository.findPaginatedNotificationIdsByTime(userId, cursorTimestamp, pageable);
+
             default:
                 throw new IllegalArgumentException("Unknown feed type: " + type);
         }
     }
 
     private List<Integer> getUsersForYouFeed (Integer userId, long cursor, Pageable pageable) {
-//        printFeed(feedEntryRepository.findAllByUserId(13), 13);
 
         if (userId == null) {
             System.out.println("userId required for you feed, getting generic");
             Timestamp cursorTimestamp = new Timestamp(cursor);
             return postRepository.findNextPaginatedPostIdsByTime(cursorTimestamp, pageable);
         } else {
+            List<Integer> ids;
 
-            List<Integer> ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
-            System.out.println("Old ids is: " + ids);
-
-            if (ids.isEmpty()) {
+            //If user refreshes or something then give them a new feed.
+            //TODO how to make sure it doesnt happen twice when logging in?
+            if (cursor == 0) {
+                System.out.println("Creating NEW feed for user: " + userId);
                 ArrayList<PostRank> postRanks = edgeRank.buildAndGetNewFeed(userId);
                 edgeRank.saveFeed(userId, postRanks);
                 ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
+                System.out.println("New Feed Generated: " + Arrays.toString(ids.toArray()));
+            } else {
+                ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
+                System.out.println("Old ids is: " + ids);
+                if (ids.isEmpty()) {
+                    ArrayList<PostRank> postRanks = edgeRank.buildAndGetNewFeed(userId);
+                    edgeRank.saveFeed(userId, postRanks);
+                    ids = feedEntryRepository.getFeedPostIdsCustom(userId, cursor, pageable);
+                }
             }
-
-            System.out.println("to return ids is: " + ids);
             return ids;
         }
     }
