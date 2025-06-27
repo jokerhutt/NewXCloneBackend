@@ -56,7 +56,6 @@ public class AuthService {
         newUser.setBannerImage(parseDefaultImage("static/assets/defaultBanner.jpg"));
 
         userRepository.save(newUser);
-        edgeRank.generateFeed(newUser.getId());
         return newUser;
 
     }
@@ -74,7 +73,6 @@ public class AuthService {
 
         if (user.isPresent()) {
             User toReturn = user.get();
-            edgeRank.generateFeed(toReturn.getId());
             return toReturn;
         } else {
             return createNewGoogleUser(userInfo);
@@ -93,7 +91,6 @@ public class AuthService {
         User newUser = new User();
         newUser.setGoogleId(googleId);
 
-        //TODO make sure this never collides, maybe keep trying until a unique one??
         int suffix = (int)(Math.random() * 90000) + 10000;
         newUser.setUsername(parseGoogleUserName(firstName, lastName, suffix));
         newUser.setDisplayName(parseGoogleDisplayName(firstName, lastName, suffix));
@@ -110,6 +107,9 @@ public class AuthService {
         return newUser;
 
     }
+
+    //TODO make sure this never collides, maybe keep trying until a unique one??
+
 
 
 
