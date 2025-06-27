@@ -63,29 +63,14 @@ public class PostService {
         if (postMedia == null) {
             return null;
         } else {
-            System.out.println("FILE NAME IS: " + postMedia.getFileName() + "DATA: " + postMedia.getData());
+//            System.out.println("FILE NAME IS: " + postMedia.getFileName() + "DATA: " + postMedia.getData());
             return postMedia;
         }
 
     }
 
-//    public Map<String, Object> getPaginatedPostDTOs(int cursor, int limit) {
-//        Pageable pageable = PageRequest.of(0, limit, Sort.by("id").descending());
-//        List<Post> posts = postRepository.findNextPaginatedPostIds(cursor, pageable);
-//
-//        ArrayList<Integer> ids = new ArrayList<>();
-//
-//        for (Post post : posts) {
-//            ids.add(post.getId());
-//        }
-//
-//        Integer nextCursor = posts.size() < limit ? null : posts.get(posts.size() - 1).getId();
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("posts", ids);
-//        response.put("nextCursor", nextCursor);
-//        return response;
-//    }
+    //TODO add some kind of feed refresh intervals?
+    //TODO how to handle feed refresh when user refreshing but still authenticated?
 
     public Map preparePostMediaMapToBase64 (PostMedia postMedia) {
 
@@ -101,10 +86,6 @@ public class PostService {
 
     public List<PostMedia> getAllPostMediaByPostId(ArrayList<Integer> ids) {
         return postMediaRepository.findAllByPostIdIn(ids);
-    }
-
-    public Optional<Post> findByUserId(int id) {
-        return postRepository.findByUserId(id);
     }
 
     public ArrayList<PostDTO> findAllPostDTOByIds( ArrayList<Integer> ids) {
@@ -194,12 +175,6 @@ public class PostService {
             }
         }
 
-        return ids;
-    }
-
-    public ArrayList<Integer> findAllPostsAndRepliesIds () {
-        ArrayList<Integer> ids = new ArrayList<>();
-        postRepository.findAll().forEach(post -> ids.add(post.getId()));
         return ids;
     }
 
