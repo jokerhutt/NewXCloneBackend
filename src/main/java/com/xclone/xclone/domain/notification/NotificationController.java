@@ -15,27 +15,10 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @PostMapping("/newNotification")
-    public ResponseEntity<?> createNotification(@RequestBody NewNotification newNotification) {
-        if (notificationService.addNotification(newNotification)) {
-            return ResponseEntity.ok("SUCCESS");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("NOTSUCCESS");
-        }
-    }
-
     @GetMapping("/unseenIds/{id}")
-    public ResponseEntity<?> getUsersInseenNotifications(@PathVariable Integer id) {
+    public ResponseEntity<?> getUsersUnseenNotifications(@PathVariable Integer id) {
         System.out.println("Getting notifications for " + id);
-
-        return ResponseEntity.ok(notificationService.getUsersUnseenIds(id));
-    }
-
-    @GetMapping("/getAllNotifications/{receiverId}")
-    public ResponseEntity<?> getAllNotificationsForUser(@PathVariable Integer receiverId) {
-        ArrayList<NotificationDTO> toReturn = notificationService.getUsersNotifications(receiverId);
-        System.out.println(toReturn.size());
-        return ResponseEntity.ok(toReturn);
+        return ResponseEntity.ok(notificationService.getUsersUnseenIdsAndMarkAllAsSeen(id));
     }
 
     @PostMapping("/getNotifications")

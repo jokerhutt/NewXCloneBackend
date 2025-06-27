@@ -80,14 +80,6 @@ public class NotificationService {
         return newNotification;
     }
 
-    @Transactional
-    public boolean deleteNotification(Notification toDelete) {
-        if (notificationRepository.existsById(toDelete.getId())) {
-            notificationRepository.deleteById(toDelete.getId());
-        }
-        return true;
-    }
-
     public void createNotificationFromType(Integer senderId, Integer referenceId, String type) {
         NewNotification toCreate;
         switch (type) {
@@ -176,7 +168,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public List<Integer> getUsersUnseenIds (Integer receiverId) {
+    public List<Integer> getUsersUnseenIdsAndMarkAllAsSeen (Integer receiverId) {
         System.out.println("Getting and refreshing unseen ids");
         List<Integer> unseenIds = notificationRepository.findUnseenNotificationIds(receiverId);
         System.out.println("unseen size is" + unseenIds.size());
@@ -184,26 +176,6 @@ public class NotificationService {
         System.out.println("after marking unseen size is" + unseenIds.size());
 
         return  unseenIds;
-    }
-
-    public ArrayList<NotificationDTO> getUsersNotifications (Integer userId) {
-
-        ArrayList<Notification> userNotifications = notificationRepository.findAllByReceiverId(userId);
-        ArrayList<NotificationDTO> userNotificationDTOs = new ArrayList<>();
-        if (userNotifications != null) {
-            for (Notification notification : userNotifications) {
-                    userNotificationDTOs.add(new NotificationDTO(notification));
-            }
-        }
-        return userNotificationDTOs;
-
-    }
-
-    @Transactional
-    public void markAllReceiverNotificationsAsSeen(Integer receiverId) {
-
-        notificationRepository.markAllAsSeen(receiverId);
-
     }
 
     public boolean checkExistingNotification(NewNotification newNotification) {
