@@ -61,8 +61,8 @@ public class FeedService {
             }
         } else {
             Integer lastPostIdInt = ids.size() < limit ? null : ids.get(ids.size() - 1);
-            if (lastPostIdInt != null && userId != null) {
-                if (type.equals("Notifications")) {
+            if (lastPostIdInt != null) {
+                if (type.equals("Notifications") && userId != null) {
 
                     Optional<Notification> notification = notificationRepository.findById(lastPostIdInt);
                     if (notification.isPresent()) {
