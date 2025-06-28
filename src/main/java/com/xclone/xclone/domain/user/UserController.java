@@ -13,11 +13,13 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final PostService postService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(UserService userService, PostService postService) {
+    public UserController(UserService userService, PostService postService, UserRepository userRepository) {
         this.userService = userService;
         this.postService = postService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/getUser")
@@ -34,6 +36,11 @@ public class UserController {
     public ResponseEntity<String> getProfilePic(@RequestParam Integer id) {
         System.out.println("Requested pfp for: " + id);
         return ResponseEntity.ok(userService.getUserProfileMedia(id, "profilePic"));
+    }
+
+    @GetMapping("/getTopFiveUsers")
+    public ResponseEntity<?> getTopFiveUsers() {
+        return ResponseEntity.ok(userRepository.findUserIdsByFollowerCount(99999, 4));
     }
 
     @GetMapping("/getBannerImage")
