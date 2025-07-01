@@ -3,6 +3,7 @@ import com.xclone.xclone.domain.bookmark.NewBookmark;
 import com.xclone.xclone.domain.post.PostDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -18,9 +19,11 @@ public class LikeController {
     }
 
     @PostMapping("/createLike")
-    public ResponseEntity<?> createLike(@RequestBody NewLike newLike) {
+    public ResponseEntity<?> createLike(@RequestBody NewLike newLike, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
+
         try {
-            PostDTO postToReturn = likeService.addNewLike(newLike.getLikerId(), newLike.getLikedPostId());
+            PostDTO postToReturn = likeService.addNewLike(authUserId, newLike.getLikedPostId());
             return ResponseEntity.ok(postToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
@@ -28,10 +31,10 @@ public class LikeController {
     }
 
     @PostMapping("/deleteLike")
-    public ResponseEntity<?> removeLike(@RequestBody NewLike newLike) {
-
+    public ResponseEntity<?> removeLike(@RequestBody NewLike newLike, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
         try {
-            PostDTO postToReturn = likeService.deleteLike(newLike.getLikerId(), newLike.getLikedPostId());
+            PostDTO postToReturn = likeService.deleteLike(authUserId, newLike.getLikedPostId());
             return ResponseEntity.ok(postToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));

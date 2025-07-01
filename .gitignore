@@ -19,6 +19,12 @@ target/
 *.iml
 *.ipr
 
+### Env ###
+.env
+nginx/default.conf
+application.yml
+application.yaml
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -8,9 +8,13 @@ import com.xclone.xclone.domain.like.LikeService;
 import com.xclone.xclone.domain.post.PostService;
 import com.xclone.xclone.domain.retweet.RetweetService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.swing.text.html.Option;
+import java.sql.Timestamp;
 import java.util.*;
 
 import static com.xclone.xclone.util.MediaParsingUtils.encodeUserMediaToBase64;
@@ -78,19 +82,26 @@ public class UserService {
     }
 
     public Map<String, Object> getPaginatedTopUsers(Long cursor, int limit) {
-        List<Integer> userIds = userRepository.findUserIdsByFollowerCount(cursor, limit);
+        Timestamp cursorTimestamp = new Timestamp(cursor);
+        Pageable pageable = PageRequest.of(0, limit);
+        List<Integer> userIds = userRepository.findUserIdsByCreatedAtCustom(cursorTimestamp, pageable);
 
-        System.out.println("Got paginated user ids: " + userIds + " size: " + userIds.size());
 
         Long nextCursor = null;
 
-        if (!userIds.isEmpty()) {
+        if (!userIds.isEmpty() && userIds.size() == limit) {
             Integer lastUserId = userIds.get(userIds.size() - 1);
-            UserDTO lastUser = generateUserDTOByUserId(lastUserId);
-            nextCursor = (long) lastUser.followers.size();
+
+            Optional<User> lastUser = userRepository.findById(lastUserId);
+            if (lastUser.isPresent()) {
+                nextCursor = lastUser.get().getCreatedAt().getTime();
+            } else {
+                throw new IllegalArgumentException("UserId doesn't exist");
+            }
         }
 
-        System.out.println("nextCursor: " + nextCursor);
+
+        System.out.println(" Users length is: " + userIds.size());
 
         Map<String, Object> response = new HashMap<>();
         response.put("users", userIds);

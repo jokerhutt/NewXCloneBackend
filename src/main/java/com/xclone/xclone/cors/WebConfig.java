@@ -13,10 +13,12 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:5174") // adjust to your React dev origin
-                        .allowedMethods("*") // includes OPTIONS
-                        .allowedHeaders("*") // allow any headers
-                        .allowCredentials(true); // if you use cookies or Authorization header
+                        .allowedOrigins(
+                                "https://jokerhut.com"
+                        )
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }

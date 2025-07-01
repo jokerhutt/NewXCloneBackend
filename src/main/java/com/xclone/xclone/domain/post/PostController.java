@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,19 +68,20 @@ public class PostController {
 
     @PostMapping("/createPost")
     public ResponseEntity<?> createPost(
-            @RequestParam("userId") Integer userId,
             @RequestParam("text") String text,
             @RequestParam(value = "parentId", required = false) Integer parentId,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images
+            @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            Authentication auth
     ) {
-        Post post = postService.createPostEntity(userId, text, parentId);
+        Integer authUserId = (Integer) auth.getPrincipal();
+        Post post = postService.createPostEntity(authUserId, text, parentId);
 
         if (images != null && !images.isEmpty()) {
             postService.savePostImages(post.getId(), images);
         }
 
         if (parentId != null) {
-            notificationService.createNotificationFromType(userId, post.getId(), "reply");
+            notificationService.createNotificationFromType(authUserId, post.getId(), "reply");
         }
 
         return ResponseEntity.ok(postService.findPostDTOById(post.getId()));

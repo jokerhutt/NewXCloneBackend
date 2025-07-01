@@ -48,20 +48,20 @@ public class RetweetService {
 
 
     @Transactional
-    public PostDTO createRetweet(NewRetweet newRetweet) {
+    public PostDTO createRetweet(Integer retweeterId, NewRetweet newRetweet) {
 
-        if (retweetRepository.existsByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId)) {
+        if (retweetRepository.existsByRetweeterIdAndReferenceId(retweeterId, newRetweet.referenceId)) {
             throw new IllegalStateException("Retweet exists");
 
         }
 
         Retweet retweet = new Retweet();
-        retweet.setRetweeterId(newRetweet.retweeterId);
+        retweet.setRetweeterId(retweeterId);
         retweet.setReferenceId(newRetweet.referenceId);
         retweet.setType(newRetweet.type);
 
         retweetRepository.save(retweet);
-        notificationService.createNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
+        notificationService.createNotificationFromType(retweeterId, newRetweet.referenceId, "repost");
 
         PostDTO postDTO = postService.findPostDTOById(newRetweet.referenceId);
         if (postDTO == null) throw new IllegalStateException("Post does not exist exists");
@@ -71,10 +71,10 @@ public class RetweetService {
     }
 
     @Transactional
-    public PostDTO deleteRetweet(NewRetweet newRetweet) {
-        Retweet toDelete = retweetRepository.findByRetweeterIdAndReferenceId(newRetweet.retweeterId, newRetweet.referenceId);
+    public PostDTO deleteRetweet(Integer retweeterId, NewRetweet newRetweet) {
+        Retweet toDelete = retweetRepository.findByRetweeterIdAndReferenceId(retweeterId, newRetweet.referenceId);
         if (toDelete != null) {
-            notificationService.deleteNotificationFromType(newRetweet.retweeterId, newRetweet.referenceId, "repost");
+            notificationService.deleteNotificationFromType(retweeterId, newRetweet.referenceId, "repost");
             retweetRepository.delete(toDelete);
             PostDTO postDTO = postService.findPostDTOById(newRetweet.referenceId);
             if (postDTO == null) throw new IllegalStateException("Post does not exist exists");

@@ -125,6 +125,8 @@ public class FeedService {
                 if (userId == null) throw new IllegalArgumentException("userId required for notifications feed");
                 return notificationRepository.findPaginatedNotificationIdsByTime(userId, cursorTimestamp, pageable);
 
+
+
             default:
                 throw new IllegalArgumentException("Unknown feed type: " + type);
         }

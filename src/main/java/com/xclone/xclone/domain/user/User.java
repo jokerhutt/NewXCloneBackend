@@ -39,8 +39,8 @@ public class User {
     @Column(length = 180)
     private String bio;
 
-    @Column(nullable = false)
-    private java.sql.Timestamp createdAt;
+    @Column(name = "created_at", updatable = false, insertable = false)
+    private Timestamp createdAt;
 
 
     public String getGoogleId() {
