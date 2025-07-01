@@ -22,6 +22,8 @@ target/
 ### Env ###
 .env
 nginx/default.conf
+application.yml
+application.yaml
 
 ### NetBeans ###
 /nbproject/private/
