@@ -4,6 +4,7 @@ import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,21 +20,28 @@ public class BookmarkController {
     }
 
     @PostMapping("/createBookmark")
-    public ResponseEntity<?> createBookmark(@RequestBody NewBookmark newBookmark) {
+    public ResponseEntity<?> createBookmark(
+            @RequestBody NewBookmark newBookmark,
+            Authentication auth
+    ) {
+        Integer authUserId = (Integer) auth.getPrincipal();
         try {
-            PostDTO bookmarkToReturn = bookmarkService.addNewBookmark(newBookmark.getBookmarkedBy(), newBookmark.getBookmarkedPost());
+            PostDTO bookmarkToReturn = bookmarkService.addNewBookmark(authUserId, newBookmark.getBookmarkedPost());
             return ResponseEntity.ok(bookmarkToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
         }
-
     }
 
     @PostMapping("/deleteBookmark")
-    public ResponseEntity<?> deleteBookmark(@RequestBody NewBookmark newBookmark) {
-
-        return ResponseEntity.ok(bookmarkService.deleteBookmark(newBookmark.getBookmarkedBy(), newBookmark.getBookmarkedPost()));
-
+    public ResponseEntity<?> deleteBookmark(
+            @RequestBody NewBookmark newBookmark,
+            Authentication auth
+    ) {
+        Integer authUserId = (Integer) auth.getPrincipal();
+        return ResponseEntity.ok(
+                bookmarkService.deleteBookmark(authUserId, newBookmark.getBookmarkedPost())
+        );
     }
 
 

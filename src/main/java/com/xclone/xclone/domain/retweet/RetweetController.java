@@ -4,6 +4,7 @@ import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +24,10 @@ public class RetweetController {
     }
 
     @PostMapping("/newRetweet")
-    public ResponseEntity<?> newRetweet(@RequestBody NewRetweet newRetweet) {
+    public ResponseEntity<?> newRetweet(@RequestBody NewRetweet newRetweet, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
         try {
-            PostDTO postToReturn = retweetService.createRetweet(newRetweet);
+            PostDTO postToReturn = retweetService.createRetweet(authUserId, newRetweet);
             return ResponseEntity.ok(postToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
@@ -33,9 +35,10 @@ public class RetweetController {
     }
 
     @PostMapping("/deleteRetweet")
-    public ResponseEntity<?> deleteRetweet(@RequestBody NewRetweet retweet) {
+    public ResponseEntity<?> deleteRetweet(@RequestBody NewRetweet retweet, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
         try {
-            PostDTO postToReturn = retweetService.deleteRetweet(retweet);
+            PostDTO postToReturn = retweetService.deleteRetweet(authUserId, retweet);
             return ResponseEntity.ok(postToReturn);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));

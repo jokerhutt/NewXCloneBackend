@@ -1,6 +1,7 @@
 package com.xclone.xclone.domain.notification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -15,10 +16,10 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/unseenIds/{id}")
-    public ResponseEntity<?> getUsersUnseenNotifications(@PathVariable Integer id) {
-        System.out.println("Getting notifications for " + id);
-        return ResponseEntity.ok(notificationService.getUsersUnseenIdsAndMarkAllAsSeen(id));
+    @GetMapping("/unseenIds")
+    public ResponseEntity<?> getUsersUnseenNotifications(Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
+        return ResponseEntity.ok(notificationService.getUsersUnseenIdsAndMarkAllAsSeen(authUserId));
     }
 
     @PostMapping("/getNotifications")
