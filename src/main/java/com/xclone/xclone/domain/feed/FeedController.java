@@ -28,7 +28,7 @@ public class FeedController {
             Authentication auth
     ) {
         boolean requiresAuth = switch (type.toLowerCase()) {
-            case "bookmarks", "notifications", "liked", "replies", "foryou", "following" -> true;
+            case "bookmarks", "notifications", "foryou", "following" -> true;
             default -> false;
         };
 
