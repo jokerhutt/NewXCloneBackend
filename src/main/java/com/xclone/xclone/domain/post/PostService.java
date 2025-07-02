@@ -8,6 +8,7 @@ import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.notification.NotificationService;
 import com.xclone.xclone.domain.retweet.Retweet;
 import com.xclone.xclone.domain.retweet.RetweetRepository;
+import com.xclone.xclone.storage.CloudStorageService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -24,6 +25,7 @@ import java.util.*;
 @Service
 public class PostService {
 
+    private final CloudStorageService cloudStorageService;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -36,7 +38,7 @@ public class PostService {
     private final EdgeRank edgeRank;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank, CloudStorageService cloudStorageService) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
@@ -44,6 +46,7 @@ public class PostService {
         this.retweetRepository = retweetRepository;
         this.postMediaRepository = postMediaRepository;
         this.edgeRank = edgeRank;
+        this.cloudStorageService = cloudStorageService;
     }
 
     public PostDTO findPostDTOById(int id) {
@@ -72,17 +75,6 @@ public class PostService {
     //TODO add some kind of feed refresh intervals?
     //TODO how to handle feed refresh when user refreshing but still authenticated?
 
-    public Map preparePostMediaMapToBase64 (PostMedia postMedia) {
-
-        String base64 = Base64.getEncoder().encodeToString(postMedia.getData());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("src", "data:" + postMedia.getMimeType() + ";base64," + base64);
-        response.put("alt", postMedia.getFileName());
-        response.put("type", postMedia.getMimeType());
-
-        return response;
-    }
 
     public List<PostMedia> getAllPostMediaByPostId(ArrayList<Integer> ids) {
         return postMediaRepository.findAllByPostIdIn(ids);
@@ -111,7 +103,6 @@ public class PostService {
 
         ArrayList<Retweet> retweets = retweetRepository.findAllByReferenceId(post.getId());
         ArrayList<Integer> retweeters = new ArrayList<>();
-        ArrayList<Integer> postMediaIds = new ArrayList<>();
         ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
 
         for (Like like : likedBy) {
@@ -130,13 +121,7 @@ public class PostService {
             retweeters.add(retweet.getRetweeterId());
         }
 
-        if (postMedia != null) {
-            for (PostMedia postM: postMedia) {
-                postMediaIds.add(postM.getId());
-            }
-        }
-
-        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMediaIds);
+        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia);
     }
 
     public ArrayList<Integer> findAllPostsByUserId(int id) {
@@ -194,18 +179,18 @@ public class PostService {
         return newPost;
     }
 
-    public void savePostImages(Integer postId, List<MultipartFile> images) {
-        for (MultipartFile image : images) {
-            try {
-                byte[] data = image.getBytes();
-                String fileName = image.getOriginalFilename();
-                String mimeType = image.getContentType();
+    public void savePostImages(int postId, List<MultipartFile> images) throws IOException {
+        for (MultipartFile file : images) {
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String mimeType = file.getContentType();
 
-                PostMedia media = new PostMedia(postId, fileName, mimeType, data);
-                postMediaRepository.save(media);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to process image: " + image.getOriginalFilename());
-            }
+            System.out.println("MIME: " + file.getContentType() + ", length: " + file.getContentType().length());
+
+            String url = cloudStorageService.upload(fileName, file.getInputStream(), mimeType);
+
+            PostMedia media = new PostMedia(postId, file.getOriginalFilename(), mimeType, url);
+
+            postMediaRepository.save(media);
         }
     }
 

@@ -18,8 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.DEFAULT_ADJECTIVES;
-import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.DEFAULT_ANIMALS;
+import static com.xclone.xclone.constants.DEFAULTNAMECONSTANTS.*;
 import static com.xclone.xclone.util.UserIdentityUtils.*;
 
 @Service
@@ -44,6 +43,8 @@ public class AuthService {
 
         String firstName = DEFAULT_ADJECTIVES[random.nextInt(DEFAULT_ADJECTIVES.length)];
         String lastName = DEFAULT_ANIMALS[random.nextInt(DEFAULT_ANIMALS.length)];
+        String defaultPfp = DEFAULT_PROFILE_URLS[random.nextInt(DEFAULT_PROFILE_URLS.length)];
+
 
         int suffix = random.nextInt(90000) + 10000;
         String username = "anonymous" + suffix;
@@ -52,8 +53,8 @@ public class AuthService {
         newUser.setUsername(username);
         newUser.setEmail(username + "@gmail.com");
         newUser.setCreatedAt(Timestamp.from(Instant.now()));
-        newUser.setProfilePicture(parseDefaultImage("static/assets/defaultPFP.png"));
-        newUser.setBannerImage(parseDefaultImage("static/assets/defaultBanner.jpg"));
+        newUser.setProfilePictureUrl(defaultPfp);
+        newUser.setBannerImageUrl("https://storage.googleapis.com/xclone-media/defaultBanner.jpg");
 
         userRepository.save(newUser);
         return newUser;
@@ -98,8 +99,8 @@ public class AuthService {
         newUser.setEmail(email);
         newUser.setCreatedAt(Timestamp.from(Instant.now()));
 
-        newUser.setProfilePicture(parseGoogleImageToByte(pictureUrl));
-        newUser.setBannerImage(parseDefaultImage("static/assets/defaultBanner.jpg"));
+        newUser.setProfilePictureUrl(pictureUrl);
+        newUser.setBannerImageUrl("https://storage.googleapis.com/xclone-media/defaultBanner.jpg");
 
         userRepository.save(newUser);
         edgeRank.generateFeed(newUser.getId());

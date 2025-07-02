@@ -16,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.swing.text.html.Option;
 import java.sql.Timestamp;
 import java.util.*;
-
-import static com.xclone.xclone.util.MediaParsingUtils.encodeUserMediaToBase64;
-
 @Service
 public class UserService {
 
@@ -71,14 +68,6 @@ public class UserService {
         } else {
             return null;
         }
-    }
-
-    public String getUserProfileMedia (Integer userId, String type) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-           return encodeUserMediaToBase64(user.get(), type);
-        }
-        return null;
     }
 
     public Map<String, Object> getPaginatedTopUsers(Long cursor, int limit) {

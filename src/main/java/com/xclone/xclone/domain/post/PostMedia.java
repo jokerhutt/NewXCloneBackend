@@ -14,43 +14,43 @@ public class PostMedia {
     private Integer postId;
     private String fileName;
     private String mimeType;
-
-    @Lob
-    @Column(length = 16777215) // MEDIUMBLOB size
-    private byte[] data;
+    private String url; // ✅ New field instead of byte[]
 
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     public PostMedia() {}
 
-    public PostMedia(Integer postId, String fileName, String mimeType, byte[] data) {
+    public PostMedia(Integer postId, String fileName, String mimeType, String url) {
         this.postId = postId;
         this.fileName = fileName;
         this.mimeType = mimeType;
-        this.data = data;
+        this.url = url;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getId() { return id; }
+    public Integer getPostId() { return postId; }
+    public String getFileName() { return fileName; }
+    public String getMimeType() { return mimeType; }
+    public String getUrl() { return url; } // ✅ new getter
+    public Timestamp getCreatedAt() { return createdAt; }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Integer getPostId() {
-        return postId;
+    public void setPostId(Integer postId) {
+        this.postId = postId;
     }
 
-    public String getFileName() {
-        return fileName;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public String getMimeType() {
-        return mimeType;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
-    public byte[] getData() {
-        return data;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

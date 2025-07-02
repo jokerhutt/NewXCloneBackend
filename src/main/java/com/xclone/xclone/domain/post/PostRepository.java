@@ -39,14 +39,27 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     );
 
 
-    @Query("""
-    SELECT p.id FROM Post p 
-    WHERE p.userId = :userId 
-      AND p.parentId IS NULL 
-      AND p.createdAt <= :cursor 
-    ORDER BY p.createdAt DESC
-""")
-    List<Integer> findPaginatedTweetIdsByUserIdByTime(
+    @Query(value = """
+    SELECT post_id FROM (
+      SELECT p.id AS post_id, p.created_at AS activity_time
+      FROM posts p
+      WHERE p.user_id = :userId
+        AND p.parent_id IS NULL
+        AND p.created_at <= :cursor
+
+      UNION ALL
+
+      SELECT r.reference_id AS post_id, r.created_at
+      FROM retweets r
+      JOIN posts p ON p.id = r.reference_id
+      WHERE r.retweeter_id = :userId
+        AND p.user_id != :userId
+        AND r.created_at <= :cursor
+    ) AS combined
+    ORDER BY activity_time DESC
+    """,
+            nativeQuery = true)
+    List<Integer> findPostIdsByUserAndReposts(
             @Param("userId") int userId,
             @Param("cursor") Timestamp cursor,
             Pageable pageable

@@ -21,20 +21,17 @@ public class User {
     @Column(name = "google_id", unique = true)
     private String googleId;
 
-
     @Column(nullable = false, unique = true, length = 45)
     private String email;
 
     @Column(nullable = false, length = 45, name = "display_name")
     private String displayName;
 
-    @Column (nullable = false, name = "profile_picture")
-    @Lob
-    private byte[] profilePicture;
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
 
-    @Column (nullable = false, name = "banner_image")
-    @Lob
-    private byte[] bannerImage;
+    @Column(name = "banner_image_url")
+    private String bannerImageUrl;
 
     @Column(length = 180)
     private String bio;
@@ -67,14 +64,6 @@ public class User {
         return email;
     }
 
-    public byte[] getProfilePicture() {
-        return profilePicture;
-    }
-
-    public byte[] getBannerImage() {
-        return bannerImage;
-    }
-
     public String getBio() {
         return bio;
     }
@@ -99,14 +88,6 @@ public class User {
         this.email = email;
     }
 
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public void setBannerImage(byte[] bannerImage) {
-        this.bannerImage = bannerImage;
-    }
-
     public void setBio(String bio) {
         this.bio = bio;
     }
@@ -121,5 +102,21 @@ public class User {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public String getBannerImageUrl() {
+        return bannerImageUrl;
+    }
+
+    public void setBannerImageUrl(String bannerImageUrl) {
+        this.bannerImageUrl = bannerImageUrl;
     }
 }
