@@ -32,20 +32,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUserDTOByIds(ids));
     }
 
-    @GetMapping("/getProfilePic")
-    public ResponseEntity<String> getProfilePic(@RequestParam Integer id) {
-        System.out.println("Requested pfp for: " + id);
-        return ResponseEntity.ok(userService.getUserProfileMedia(id, "profilePic"));
-    }
-
     @GetMapping("/getTopFiveUsers")
     public ResponseEntity<?> getTopFiveUsers() {
         return ResponseEntity.ok(userRepository.findUserIdsByFollowerCount(99999, 4));
-    }
-
-    @GetMapping("/getBannerImage")
-    public ResponseEntity<String> getBannerImage(@RequestParam Integer id) {
-        return ResponseEntity.ok(userService.getUserProfileMedia(id, "bannerImage"));
     }
 
     @GetMapping("/getAdminUser")

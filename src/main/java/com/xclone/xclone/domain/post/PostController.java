@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -47,13 +48,16 @@ public class PostController {
     @GetMapping("/getPostMediaById")
     public ResponseEntity<?> getPostMedia(@RequestParam Integer id) {
         PostMedia media = postService.getPostMediaById(id);
-        if (media == null || media.getData() == null) {
+        if (media == null || media.getUrl() == null) {
             return ResponseEntity.notFound().build();
         }
 
-        Map encodedPostMedia = postService.preparePostMediaMapToBase64(media);
+        Map<String, String> response = new HashMap<>();
+        response.put("src", media.getUrl());
+        response.put("alt", media.getFileName());
+        response.put("type", media.getMimeType());
+        return ResponseEntity.ok(response);
 
-        return ResponseEntity.ok(encodedPostMedia);
     }
 
     @GetMapping("/getSinglePost/{id}")
@@ -72,7 +76,7 @@ public class PostController {
             @RequestParam(value = "parentId", required = false) Integer parentId,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
             Authentication auth
-    ) {
+    ) throws IOException {
         Integer authUserId = (Integer) auth.getPrincipal();
         Post post = postService.createPostEntity(authUserId, text, parentId);
 
