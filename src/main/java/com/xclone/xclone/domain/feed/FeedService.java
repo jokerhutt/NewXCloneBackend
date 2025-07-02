@@ -103,7 +103,7 @@ public class FeedService {
 
             case "tweets":
                 if (userId == null) throw new IllegalArgumentException("userId required for tweets feed");
-                return postRepository.findPaginatedTweetIdsByUserIdByTime(userId, cursorTimestamp, pageable);
+                return postRepository.findPostIdsByUserAndReposts(userId, cursorTimestamp, pageable);
 
             case "liked":
                 if (userId == null) throw new IllegalArgumentException("userId required for liked feed");
