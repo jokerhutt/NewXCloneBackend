@@ -10,5 +10,13 @@ public class DEFAULTNAMECONSTANTS {
             "Chinchilla", "Mouse", "Cat", "Platypus", "Rhino", "Otter", "Falcon", "Bear", "Llama", "Koala"
     };
 
+    public static final String[] DEFAULT_PROFILE_URLS = {
+            "https://storage.googleapis.com/xclone-media/deffive.png",
+            "https://storage.googleapis.com/xclone-media/deffour.png",
+            "https://storage.googleapis.com/xclone-media/defthree.png",
+            "https://storage.googleapis.com/xclone-media/deftwo.png",
+            "https://storage.googleapis.com/xclone-media/defone.png"
+    };
+
 
 }
