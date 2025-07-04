@@ -1,6 +1,10 @@
 package com.xclone.xclone.domain.post;
 
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.user.User;
+import com.xclone.xclone.domain.user.UserDTO;
+import com.xclone.xclone.domain.user.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +29,14 @@ public class PostController {
     private final PostService postService;
     private final NotificationService notificationService;
     private final PostRepository postRepository;
+    private final UserService userService;
 
     @Autowired
-    public PostController(PostService postService, NotificationService notificationService, PostRepository postRepository) {
+    public PostController(PostService postService, NotificationService notificationService, PostRepository postRepository, UserService userService) {
         this.postService = postService;
         this.notificationService = notificationService;
         this.postRepository = postRepository;
+        this.userService = userService;
     }
 
     @PostMapping("/getPosts")
@@ -68,6 +74,40 @@ public class PostController {
     @GetMapping("/getAllPostIds")
     public ResponseEntity<?> getAllPostIds() {
         return ResponseEntity.ok(postService.findAllPostIds());
+    }
+
+    @PostMapping("/deletePost")
+    public ResponseEntity<?> deletePost(@RequestBody Integer postId, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
+        try {
+            postService.deletePost(postId, authUserId);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized to delete this post");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
+        }
+
+    }
+
+    @PostMapping("/pinPost")
+    public ResponseEntity<?> pinPost(@RequestParam Integer postId, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
+
+        User toReturn = postService.handlePinPost(postId, authUserId, false);
+        UserDTO userToReturn = userService.generateUserDTOByUserId(toReturn.getId());
+        return ResponseEntity.ok(userToReturn);
+    }
+
+    @PostMapping("/unpinPost")
+    public ResponseEntity<?> unpinPost(@RequestParam Integer postId, Authentication auth) {
+        Integer authUserId = (Integer) auth.getPrincipal();
+
+        User toReturn = postService.handlePinPost(postId, authUserId, true);
+        UserDTO userToReturn = userService.generateUserDTOByUserId(toReturn.getId());
+        return ResponseEntity.ok(userToReturn);
     }
 
     @PostMapping("/createPost")

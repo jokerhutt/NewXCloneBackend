@@ -14,6 +14,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                         .allowedOrigins(
+                                "http://localhost:5174",
                                 "https://jokerhut.com"
                         )
                         .allowedMethods("*")

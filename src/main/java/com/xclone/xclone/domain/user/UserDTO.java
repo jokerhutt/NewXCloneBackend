@@ -21,6 +21,7 @@ public class UserDTO {
     public ArrayList<Integer> retweets;
     public String profilePictureUrl;
     public String bannerImageUrl;
+    public Integer pinnedPostId;
 
 
     public UserDTO(User user, ArrayList<Integer> posts, ArrayList<Integer> bookmarkedPosts, ArrayList<Integer> likedPosts, ArrayList<Integer> followers, ArrayList<Integer> following, ArrayList<Integer> replies, ArrayList<Integer> retweets) {
@@ -28,6 +29,7 @@ public class UserDTO {
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.bio = user.getBio();
+        this.pinnedPostId = user.getPinnedPostId();
         this.profilePictureUrl = user.getProfilePictureUrl();
         this.bannerImageUrl = user.getBannerImageUrl();
         this.displayName = user.getDisplayName();
