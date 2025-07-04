@@ -32,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7); // remove "Bearer "
+        String token = authHeader.substring(7);
 
         if (!jwtService.isTokenValid(token)) {
             filterChain.doFilter(request, response);

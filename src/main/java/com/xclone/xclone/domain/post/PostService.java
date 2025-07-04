@@ -67,24 +67,7 @@ public class PostService {
 
     }
 
-    public PostMedia getPostMediaById(int id) {
-        PostMedia postMedia = postMediaRepository.findById(id).orElse(null);
-        if (postMedia == null) {
-            return null;
-        } else {
-//            System.out.println("FILE NAME IS: " + postMedia.getFileName() + "DATA: " + postMedia.getData());
-            return postMedia;
-        }
-
-    }
-
     //TODO add some kind of feed refresh intervals?
-    //TODO how to handle feed refresh when user refreshing but still authenticated?
-
-
-    public List<PostMedia> getAllPostMediaByPostId(ArrayList<Integer> ids) {
-        return postMediaRepository.findAllByPostIdIn(ids);
-    }
 
     public ArrayList<PostDTO> findAllPostDTOByIds( ArrayList<Integer> ids) {
         ArrayList<PostDTO> postDTOs = new ArrayList<>();

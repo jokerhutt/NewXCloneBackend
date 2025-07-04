@@ -22,7 +22,7 @@ public class FollowController {
         this.userService = userService;
     }
 
-    @PostMapping("/followUser")
+    @PostMapping("/follow")
     public ResponseEntity<?> createFollow (@RequestBody NewFollow newFollow, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
 
@@ -34,7 +34,7 @@ public class FollowController {
         }
     }
 
-    @PostMapping("/unfollowUser")
+    @PostMapping("/unfollow")
     public ResponseEntity<?> unfollowUser (@RequestBody NewFollow newFollow, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
 

@@ -18,7 +18,7 @@ public class LikeController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/createLike")
+    @PostMapping("/create")
     public ResponseEntity<?> createLike(@RequestBody NewLike newLike, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
 
@@ -30,7 +30,7 @@ public class LikeController {
         }
     }
 
-    @PostMapping("/deleteLike")
+    @PostMapping("/delete")
     public ResponseEntity<?> removeLike(@RequestBody NewLike newLike, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
         try {

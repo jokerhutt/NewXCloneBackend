@@ -25,6 +25,10 @@ nginx/default.conf
 application.yml
 application.yaml
 
+### Deploy ###
+deploy.sh
+/deploy.sh
+.DS_Store
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

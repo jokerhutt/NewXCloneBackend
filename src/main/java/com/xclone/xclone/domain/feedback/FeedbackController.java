@@ -22,7 +22,7 @@ public class FeedbackController {
         this.feedbackRepository = feedbackRepository;
     }
 
-    @PostMapping("/addFeedback")
+    @PostMapping("/add-feedback")
     public ResponseEntity<?> addFeedback(@RequestBody Feedback newFeedback) {
 
         Feedback feedback = new Feedback();

@@ -19,7 +19,7 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    @GetMapping("/getFeedPage")
+    @GetMapping("/get-feed-page")
     public ResponseEntity<?> getFeedPage(
             @RequestParam String type,
             @RequestParam(defaultValue = "0") long cursor,

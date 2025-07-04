@@ -22,17 +22,17 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/getUser")
+    @GetMapping("/get-user")
     public ResponseEntity<?> getUserById(@RequestParam Integer id) {
         return ResponseEntity.ok(userService.generateUserDTOByUserId(id));
     }
 
-    @PostMapping("/getUsers")
+    @PostMapping("/get-users")
     public ResponseEntity<?> getUsers(@RequestBody ArrayList<Integer> ids) {
         return ResponseEntity.ok(userService.findAllUserDTOByIds(ids));
     }
 
-    @GetMapping("/getTopFiveUsers")
+    @GetMapping("/get-top-five")
     public ResponseEntity<?> getTopFiveUsers() {
         return ResponseEntity.ok(userRepository.findUserIdsByFollowerCount(99999, 4));
     }
@@ -44,12 +44,12 @@ public class UserController {
         return ResponseEntity.ok(userService.generateUserDTOByUserId(id));
     }
 
-    @GetMapping("/searchUsers")
+    @GetMapping("/search")
     public List<Integer> searchUsers(@RequestParam String q) {
         return userService.searchUsersByName(q);
     }
 
-    @GetMapping("/getDiscoverFeed")
+    @GetMapping("/get-discover")
     public ResponseEntity<?> getFeedPage(
             @RequestParam(defaultValue = "0") long cursor,
             @RequestParam(defaultValue = "10") int limit
