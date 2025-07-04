@@ -25,7 +25,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/google")
+    @PostMapping("/google-login")
     public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> body) {
         String accessToken = body.get("token");
 
@@ -56,7 +56,7 @@ public class AuthController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/tempSignup")
+    @PostMapping("/demo-signup")
     public ResponseEntity<?> authenticateWithTempSignup() {
         User newTempuser = authService.registerTemporaryUser();
         UserDTO dtoToReturn = userService.generateUserDTOByUserId(newTempuser.getId());

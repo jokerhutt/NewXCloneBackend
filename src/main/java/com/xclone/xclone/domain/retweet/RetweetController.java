@@ -23,7 +23,7 @@ public class RetweetController {
         this.retweetService = retweetService;
     }
 
-    @PostMapping("/newRetweet")
+    @PostMapping("/create")
     public ResponseEntity<?> newRetweet(@RequestBody NewRetweet newRetweet, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
         try {
@@ -34,7 +34,7 @@ public class RetweetController {
         }
     }
 
-    @PostMapping("/deleteRetweet")
+    @PostMapping("/delete")
     public ResponseEntity<?> deleteRetweet(@RequestBody NewRetweet retweet, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
         try {

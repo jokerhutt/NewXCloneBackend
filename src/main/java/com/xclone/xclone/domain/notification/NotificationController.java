@@ -16,13 +16,13 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/unseenIds")
+    @GetMapping("/get-unseen")
     public ResponseEntity<?> getUsersUnseenNotifications(Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
         return ResponseEntity.ok(notificationService.getUsersUnseenIdsAndMarkAllAsSeen(authUserId));
     }
 
-    @PostMapping("/getNotifications")
+    @PostMapping("/get-notifications")
     public ResponseEntity<?> getNotifications(@RequestBody ArrayList<Integer> ids) {
         System.out.println("Received request to retrieve notifications");
         return ResponseEntity.ok(notificationService.findAllNotificationDTOsById(ids));

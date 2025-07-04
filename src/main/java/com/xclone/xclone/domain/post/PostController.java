@@ -39,44 +39,18 @@ public class PostController {
         this.userService = userService;
     }
 
-    @PostMapping("/getPosts")
+    @PostMapping("/get-posts")
     public ResponseEntity<?> getPost(@RequestBody ArrayList<Integer> ids) {
         System.out.println("Received request to retrieve posts");
         return ResponseEntity.ok(postService.findAllPostDTOByIds(ids));
     }
 
-    @GetMapping("/getAllPostMediaByPostId")
-    public ResponseEntity<?> getPostMedias(@RequestBody ArrayList<Integer> ids) {
-        return ResponseEntity.ok(postService.getAllPostMediaByPostId(ids));
-    }
-
-    //TODO cleanup
-    @GetMapping("/getPostMediaById")
-    public ResponseEntity<?> getPostMedia(@RequestParam Integer id) {
-        PostMedia media = postService.getPostMediaById(id);
-        if (media == null || media.getUrl() == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Map<String, String> response = new HashMap<>();
-        response.put("src", media.getUrl());
-        response.put("alt", media.getFileName());
-        response.put("type", media.getMimeType());
-        return ResponseEntity.ok(response);
-
-    }
-
-    @GetMapping("/getSinglePost/{id}")
+    @GetMapping("/get-post/{id}")
     public ResponseEntity<?> getSinglePost(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.findPostDTOById(id));
     }
 
-    @GetMapping("/getAllPostIds")
-    public ResponseEntity<?> getAllPostIds() {
-        return ResponseEntity.ok(postService.findAllPostIds());
-    }
-
-    @PostMapping("/deletePost")
+    @PostMapping("/delete")
     public ResponseEntity<?> deletePost(@RequestBody Integer postId, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
         try {
@@ -92,7 +66,7 @@ public class PostController {
 
     }
 
-    @PostMapping("/pinPost")
+    @PostMapping("/pin")
     public ResponseEntity<?> pinPost(@RequestParam Integer postId, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
 
@@ -101,7 +75,7 @@ public class PostController {
         return ResponseEntity.ok(userToReturn);
     }
 
-    @PostMapping("/unpinPost")
+    @PostMapping("/unpin")
     public ResponseEntity<?> unpinPost(@RequestParam Integer postId, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
 
@@ -110,7 +84,7 @@ public class PostController {
         return ResponseEntity.ok(userToReturn);
     }
 
-    @PostMapping("/createPost")
+    @PostMapping("/create")
     public ResponseEntity<?> createPost(
             @RequestParam("text") String text,
             @RequestParam(value = "parentId", required = false) Integer parentId,

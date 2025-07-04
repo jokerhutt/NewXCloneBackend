@@ -19,7 +19,7 @@ public class BookmarkController {
         this.bookmarkService = bookmarkService;
     }
 
-    @PostMapping("/createBookmark")
+    @PostMapping("/create")
     public ResponseEntity<?> createBookmark(
             @RequestBody NewBookmark newBookmark,
             Authentication auth
@@ -33,7 +33,7 @@ public class BookmarkController {
         }
     }
 
-    @PostMapping("/deleteBookmark")
+    @PostMapping("/delete")
     public ResponseEntity<?> deleteBookmark(
             @RequestBody NewBookmark newBookmark,
             Authentication auth
