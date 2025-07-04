@@ -105,6 +105,12 @@ public class NotificationService {
 
     }
 
+    @Transactional
+    public void deleteAllNonFollowNotificationsByReferenceId(Integer referenceId) {
+        List<Notification> toDelete = notificationRepository.findByReferenceIdWhereTypeIsNotFollow(referenceId);
+        notificationRepository.deleteAll(toDelete);
+    }
+
     public NewNotification createNewNotificationTemplateFromPost(Integer senderId, Integer postId, String type) {
         NewNotification newNotification = new NewNotification();
         newNotification.senderId = senderId;

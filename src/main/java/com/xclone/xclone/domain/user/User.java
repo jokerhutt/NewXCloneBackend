@@ -39,6 +39,9 @@ public class User {
     @Column(name = "created_at", updatable = false, insertable = false)
     private Timestamp createdAt;
 
+    @Column(name = "pinned_post_id")
+    private Integer pinnedPostId;
+
 
     public String getGoogleId() {
         return googleId;
@@ -102,6 +105,14 @@ public class User {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public Integer getPinnedPostId() {
+        return pinnedPostId;
+    }
+
+    public void setPinnedPostId(Integer pinnedPostId) {
+        this.pinnedPostId = pinnedPostId;
     }
 
     public String getProfilePictureUrl() {

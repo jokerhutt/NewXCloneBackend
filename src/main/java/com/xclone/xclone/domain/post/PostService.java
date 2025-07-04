@@ -5,11 +5,15 @@ import com.xclone.xclone.domain.bookmark.BookmarkRepository;
 import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.like.Like;
 import com.xclone.xclone.domain.like.LikeRepository;
+import com.xclone.xclone.domain.notification.Notification;
 import com.xclone.xclone.domain.notification.NotificationService;
 import com.xclone.xclone.domain.retweet.Retweet;
 import com.xclone.xclone.domain.retweet.RetweetRepository;
+import com.xclone.xclone.domain.user.User;
+import com.xclone.xclone.domain.user.UserRepository;
 import com.xclone.xclone.storage.CloudStorageService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +30,7 @@ import java.util.*;
 public class PostService {
 
     private final CloudStorageService cloudStorageService;
+    private final UserRepository userRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -38,7 +43,7 @@ public class PostService {
     private final EdgeRank edgeRank;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank, CloudStorageService cloudStorageService) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank, CloudStorageService cloudStorageService, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
@@ -47,6 +52,7 @@ public class PostService {
         this.postMediaRepository = postMediaRepository;
         this.edgeRank = edgeRank;
         this.cloudStorageService = cloudStorageService;
+        this.userRepository = userRepository;
     }
 
     public PostDTO findPostDTOById(int id) {
@@ -177,6 +183,56 @@ public class PostService {
         Post newPost = postRepository.save(post);
 
         return newPost;
+    }
+
+    @Transactional
+    public User handlePinPost (Integer postId, Integer pinnerId, boolean delete) {
+
+        Optional<Post> post = postRepository.findById(postId);
+        if (post.isEmpty()) throw new EntityNotFoundException("Post not found");
+        Post retrievedPost = post.get();
+        if (retrievedPost.getUserId() !=  pinnerId) throw new IllegalArgumentException("Failed, not post owner");
+
+        User user = userRepository.findById(pinnerId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (delete) {
+            user.setPinnedPostId(null);
+        } else {
+            user.setPinnedPostId(postId);
+        }
+
+        userRepository.save(user);
+
+        return user;
+
+    }
+
+    public void deletePost (Integer postId, Integer deleterId) {
+        System.out.println("Deleting post by: " + postId);
+        Optional<Post> post = postRepository.findById(postId);
+
+        if (post.isEmpty()) throw new EntityNotFoundException("Post not found");
+
+        Post postEntity = post.get();
+        Integer toDeleteId = postEntity.getId();
+        if (deleterId != postEntity.getUserId()) throw new IllegalArgumentException("Failed, not post owner");
+        notificationService.deleteAllNonFollowNotificationsByReferenceId(toDeleteId);
+        deleteReplies(postEntity);
+        postRepository.delete(postEntity);
+
+        System.out.println("Deleted post by: " + postId);
+
+    }
+
+    //Delete all child notifs using DFS
+    public void deleteReplies(Post post) {
+        List<Post> children = postRepository.findAllByParentId(post.getId());
+        for (Post child : children) {
+            deleteReplies(child);
+            notificationService.deleteAllNonFollowNotificationsByReferenceId(child.getId());
+            postRepository.delete(child);
+        }
     }
 
     public void savePostImages(int postId, List<MultipartFile> images) throws IOException {

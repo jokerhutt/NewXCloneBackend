@@ -26,5 +26,12 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     @Query("SELECT n.id FROM Notification n WHERE n.receiverId = :userId AND n.createdAt < :cursor ORDER BY n.createdAt DESC")
     List<Integer> findPaginatedNotificationIdsByTime(@Param("userId") int userId, @Param("cursor") Timestamp cursor, Pageable pageable);
 
+    @Modifying
+    @Query("DELETE FROM Notification n WHERE n.referenceId = :id AND n.type <> 'follow'")
+    int deleteByReferenceIdWhereTypeIsNotFollow(@Param("id") Integer id);
+
+    @Query("SELECT n FROM Notification n WHERE n.referenceId = :id AND n.type <> 'follow'")
+    List<Notification> findByReferenceIdWhereTypeIsNotFollow(@Param("id") Integer id);
+
 }
 
