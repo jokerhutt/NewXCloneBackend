@@ -1,11 +1,6 @@
 package com.xclone.xclone.domain.notification;
 
-import com.xclone.xclone.domain.post.Post;
-import com.xclone.xclone.domain.user.User;
-import com.xclone.xclone.domain.user.UserDTO;
-
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
 public class NotificationDTO {
 

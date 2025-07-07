@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.post;
 
+import com.xclone.xclone.constants.BANNED;
 import com.xclone.xclone.domain.notification.NotificationService;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
@@ -93,6 +94,12 @@ public class PostController {
     ) throws IOException {
         Integer authUserId = (Integer) auth.getPrincipal();
         Post post = postService.createPostEntity(authUserId, text, parentId);
+
+        for (String banned : BANNED.WORDS) {
+            if (text.toLowerCase().contains(banned)) {
+                throw new IllegalArgumentException("Please dont");
+            }
+        }
 
         if (images != null && !images.isEmpty()) {
             postService.savePostImages(post.getId(), images);
