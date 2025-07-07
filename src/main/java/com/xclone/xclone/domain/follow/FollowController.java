@@ -25,7 +25,6 @@ public class FollowController {
     @PostMapping("/follow")
     public ResponseEntity<?> createFollow (@RequestBody NewFollow newFollow, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
-
         try {
             UserDTO followedUserToReturn = followService.addNewFollow(authUserId, newFollow.followedId);
             return ResponseEntity.ok(followedUserToReturn);
@@ -37,7 +36,6 @@ public class FollowController {
     @PostMapping("/unfollow")
     public ResponseEntity<?> unfollowUser (@RequestBody NewFollow newFollow, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
-
         try {
             UserDTO followedUserToReturn = followService.deleteFollow(authUserId, newFollow.followedId);
             return ResponseEntity.ok(followedUserToReturn);

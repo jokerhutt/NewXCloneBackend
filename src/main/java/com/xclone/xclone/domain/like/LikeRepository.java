@@ -1,13 +1,8 @@
 package com.xclone.xclone.domain.like;
-import com.xclone.xclone.domain.bookmark.Bookmark;
-import com.xclone.xclone.domain.post.Post;
-import com.xclone.xclone.domain.user.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.awt.print.Book;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +14,8 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
     boolean existsByLikerIdAndLikedPostId(Integer likerId, Integer likedPostId);
     Optional<Like> findByLikerIdAndLikedPostId(Integer likerId, Integer likedPostId);
 
-    @Query("""
-SELECT l.likedPostId
-FROM Like l
-JOIN Post p ON l.likedPostId = p.id
-WHERE l.likerId = :userId
-  AND l.createdAt < :cursor
-ORDER BY l.createdAt DESC
-""")
-    List<Integer> findPaginatedLikedPostIdsByTime(
-            @Param("userId") int userId,
-            @Param("cursor") Timestamp cursor,
-            Pageable pageable
-    );
+    @Query("SELECT l.likedPostId FROM Like l JOIN Post p ON l.likedPostId = p.id WHERE l.likerId = :userId AND l.createdAt < :cursor ORDER BY l.createdAt DESC")
+    List<Integer> findPaginatedLikedPostIdsByTime(@Param("userId") int userId, @Param("cursor") Timestamp cursor, Pageable pageable);
 }
 
 

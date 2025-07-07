@@ -54,8 +54,6 @@ public class LikeService {
 
     }
 
-
-
     @Transactional
     public PostDTO deleteLike(Integer likerId, Integer likedPostId) {
 

@@ -57,14 +57,12 @@ public class NotificationService {
 
     }
 
-
-
     @Transactional
     public NewNotification createReplyNotificationTemplate(Integer senderId, Integer replyPostId) {
         Optional<Post> reply = postRepository.findById(replyPostId);
         if (!reply.isPresent()) return null;
 
-        Integer parentPostId = reply.get().getParentId(); // should be non-null for replies
+        Integer parentPostId = reply.get().getParentId();
         if (parentPostId == null) return null;
 
         Optional<Post> parentPost = postRepository.findById(parentPostId);
@@ -72,8 +70,8 @@ public class NotificationService {
 
         NewNotification newNotification = new NewNotification();
         newNotification.senderId = senderId;
-        newNotification.receiverId = parentPost.get().getUserId(); // parent post's author
-        newNotification.referenceId = reply.get().getId(); // point to the reply post
+        newNotification.receiverId = parentPost.get().getUserId();
+        newNotification.referenceId = reply.get().getId();
         newNotification.text = reply.get().getText();
         newNotification.type = "reply";
 

@@ -33,6 +33,9 @@ public class User {
     @Column(name = "banner_image_url")
     private String bannerImageUrl;
 
+    @Column(name = "verified")
+    private Boolean verified;
+
     @Column(length = 180)
     private String bio;
 
@@ -42,6 +45,13 @@ public class User {
     @Column(name = "pinned_post_id")
     private Integer pinnedPostId;
 
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
 
     public String getGoogleId() {
         return googleId;

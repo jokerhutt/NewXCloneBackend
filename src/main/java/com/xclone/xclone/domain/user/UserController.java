@@ -3,8 +3,11 @@ package com.xclone.xclone.domain.user;
 import com.xclone.xclone.domain.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class UserController {
     public ResponseEntity<?> getUsers(@RequestBody ArrayList<Integer> ids) {
         return ResponseEntity.ok(userService.findAllUserDTOByIds(ids));
     }
+
 
     @GetMapping("/get-top-five")
     public ResponseEntity<?> getTopFiveUsers() {

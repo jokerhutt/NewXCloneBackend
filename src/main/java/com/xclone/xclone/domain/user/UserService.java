@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.user;
 
+import com.xclone.xclone.constants.BANNED;
 import com.xclone.xclone.domain.bookmark.BookmarkService;
 import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.follow.Follow;
@@ -7,13 +8,16 @@ import com.xclone.xclone.domain.follow.FollowRepository;
 import com.xclone.xclone.domain.like.LikeService;
 import com.xclone.xclone.domain.post.PostService;
 import com.xclone.xclone.domain.retweet.RetweetService;
+import com.xclone.xclone.storage.CloudStorageService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 @Service
@@ -27,9 +31,10 @@ public class UserService {
     private final RetweetService retweetService;
     private final FollowRepository followRepository;
     private final EdgeRank edgeRank;
+    private final CloudStorageService cloudStorageService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, RetweetService retweetService, FollowRepository followRepository, EdgeRank edgeRank) {
+    public UserService(UserRepository userRepository, PostService postService, BookmarkService bookmarkService, LikeService likeService, RetweetService retweetService, FollowRepository followRepository, EdgeRank edgeRank, CloudStorageService cloudStorageService) {
         this.userRepository = userRepository;
         this.postService = postService;
         this.bookmarkService = bookmarkService;
@@ -38,6 +43,7 @@ public class UserService {
         this.retweetService = retweetService;
         this.followRepository = followRepository;
         this.edgeRank = edgeRank;
+        this.cloudStorageService = cloudStorageService;
     }
 
     private UserDTO createUserDTO(User user) {
@@ -57,6 +63,57 @@ public class UserService {
         ArrayList<Integer> userReplies = postService.findAllRepliesByUserId(user.getId());
         ArrayList<Integer> userRetweets = retweetService.getAllRetweetedPostsByUserID(user.getId());
         return new UserDTO(user, userPosts, userBookmarks, userLikes, userFollowerIds, userFollowingIds, userReplies, userRetweets);
+    }
+
+    @Transactional
+    public void updateUserProfile(
+            int userId,
+            MultipartFile profilePicture,
+            MultipartFile bannerImage,
+            String displayName,
+            String username,
+            String bio
+    ) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+
+        for (String banned : BANNED.WORDS) {
+            if (displayName.toLowerCase().contains(banned) || username.toLowerCase().contains(banned) || bio.toLowerCase().contains(banned)) {
+                throw new IllegalArgumentException("Please dont");
+            }
+        }
+
+        if (userRepository.existsUserByUsername(username)) {
+            User toCheck =  userRepository.findByUsername(username);
+            if (toCheck.getId() != userId) {
+                throw new IllegalStateException("Username already exists");
+            }
+        }
+
+        if (username != null) {
+            user.setUsername(username);
+
+        }
+
+        user.setDisplayName(displayName);
+        user.setBio(bio);
+
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            String fileName = UUID.randomUUID() + "_" + profilePicture.getOriginalFilename();
+            String mimeType = profilePicture.getContentType();
+            String url = cloudStorageService.upload(fileName, profilePicture.getInputStream(), mimeType);
+            user.setProfilePictureUrl(url);
+        }
+
+        if (bannerImage != null && !bannerImage.isEmpty()) {
+            String fileName = UUID.randomUUID() + "_" + bannerImage.getOriginalFilename();
+            String mimeType = bannerImage.getContentType();
+            String url = cloudStorageService.upload(fileName, bannerImage.getInputStream(), mimeType);
+            user.setBannerImageUrl(url);
+        }
+
+        userRepository.save(user);
     }
 
 
