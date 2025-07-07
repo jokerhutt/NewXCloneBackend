@@ -1,5 +1,6 @@
 package com.xclone.xclone.domain.auth;
 
+import com.xclone.xclone.constants.BANNED;
 import com.xclone.xclone.domain.feed.EdgeRank;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserRepository;
