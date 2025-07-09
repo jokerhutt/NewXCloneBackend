@@ -54,16 +54,10 @@ public class PostController {
     @PostMapping("/delete")
     public ResponseEntity<?> deletePost(@RequestBody Integer postId, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
-        try {
-            postService.deletePost(postId, authUserId);
-            return ResponseEntity.ok().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized to delete this post");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
-        }
+        System.out.println("Received request to delete post");
+        System.out.println(authUserId);
+        postService.deletePost(postId, authUserId);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -94,12 +88,6 @@ public class PostController {
     ) throws IOException {
         Integer authUserId = (Integer) auth.getPrincipal();
         Post post = postService.createPostEntity(authUserId, text, parentId);
-
-        for (String banned : BANNED.WORDS) {
-            if (text.toLowerCase().contains(banned)) {
-                throw new IllegalArgumentException("Please dont");
-            }
-        }
 
         if (images != null && !images.isEmpty()) {
             postService.savePostImages(post.getId(), images);

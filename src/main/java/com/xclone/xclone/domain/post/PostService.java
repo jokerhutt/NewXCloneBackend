@@ -192,14 +192,17 @@ public class PostService {
     }
 
     public void deletePost (Integer postId, Integer deleterId) {
-        System.out.println("Deleting post by: " + postId);
         Optional<Post> post = postRepository.findById(postId);
 
         if (post.isEmpty()) throw new EntityNotFoundException("Post not found");
 
         Post postEntity = post.get();
-        Integer toDeleteId = postEntity.getId();
-        if (deleterId != postEntity.getUserId()) throw new IllegalArgumentException("Failed, not post owner");
+        Integer toDeleteId = postId;
+
+        System.out.println("Deleting post by: " + postEntity.getUserId());
+        System.out.println("Deleter: Id" + deleterId);
+
+        if (!deleterId.equals(postEntity.getUserId())) throw new IllegalArgumentException("Failed, not post owner");
         notificationService.deleteAllNonFollowNotificationsByReferenceId(toDeleteId);
         deleteReplies(postEntity);
         postRepository.delete(postEntity);

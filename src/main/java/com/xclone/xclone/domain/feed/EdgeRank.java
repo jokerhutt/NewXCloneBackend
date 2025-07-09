@@ -40,6 +40,12 @@ public class EdgeRank {
         this.feedEntryRepository = feedEntryRepository;
     }
 
+    @Transactional
+    public void generateFeed (Integer userId) {
+        ArrayList<PostRank> postRanks = buildAndGetNewFeed(userId);
+        saveFeed(userId, postRanks);
+    }
+
     public ArrayList<PostRank> buildAndGetNewFeed(Integer userId) {
         UserDTO userDTO = userService.generateUserDTOByUserId(userId);
         List<Post> posts = postRepository.findAllTopLevelPosts();
@@ -49,11 +55,6 @@ public class EdgeRank {
         return postRanks;
     }
 
-    @Transactional
-    public void generateFeed (Integer userId) {
-        ArrayList<PostRank> postRanks = buildAndGetNewFeed(userId);
-        saveFeed(userId, postRanks);
-    }
 
     @Transactional
     public void saveFeed(Integer userId, ArrayList<PostRank> feed) {
@@ -62,11 +63,7 @@ public class EdgeRank {
         feedEntryRepository.saveAll(feedEntries);
     }
 
-
     private void computeTotalScore (ArrayList<PostRank> postranks, UserDTO feedUser) {
-//        System.out.println("--------------------------------------------------------------");
-//        System.out.println("Post ID | Affinity | Weight   | Time Decay   | Total Score");
-//        System.out.println("--------------------------------------------------------------");
         for (PostRank postRank : postranks) {
 
             if (!calculateIfOwnRecentPost(postRank, feedUser)) {
@@ -75,15 +72,6 @@ public class EdgeRank {
             }
             computeTimeDecayValue(postRank);
             postRank.computeTotalScore();
-
-//            System.out.printf(
-//                    "Post ID: %-5d | Affinity: %-8.2f | Weight: %-8.2f | Time Decay: %-10.8f | Total Score: %-10.4f\n",
-//                    postRank.post.getId(),
-//                    postRank.affinity,
-//                    postRank.weight,
-//                    postRank.timeDecay,
-//                    postRank.totalScore
-//            );
         }
     }
 
@@ -135,7 +123,7 @@ public class EdgeRank {
     private double computeTimeDecay(Post post) {
         LocalDateTime createdAt = post.getCreatedAt().toLocalDateTime();
         long hoursSince = ChronoUnit.HOURS.between(createdAt, LocalDateTime.now());
-        return 1.0 / Math.pow(hoursSince + 2, 3.5);
+        return 1.0 / Math.pow(hoursSince + 1, 4.0);
     }
 
     private float computeFollowingAffinity (UserDTO feedUser, Integer postOwnerId) {
