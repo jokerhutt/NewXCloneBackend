@@ -56,7 +56,7 @@ public class AuthService {
         newUser.setCreatedAt(Timestamp.from(Instant.now()));
         newUser.setProfilePictureUrl(defaultPfp);
         newUser.setBannerImageUrl("https://storage.googleapis.com/xclone-media/defaultBanner.jpg");
-
+        newUser.setVerified(false);
         userRepository.save(newUser);
         return newUser;
 
@@ -96,7 +96,7 @@ public class AuthService {
         int suffix = (int)(Math.random() * 90000) + 10000;
         newUser.setUsername(parseGoogleUserName(firstName, lastName, suffix));
         newUser.setDisplayName(parseGoogleDisplayName(firstName, lastName, suffix));
-
+        newUser.setVerified(false);
         newUser.setEmail(email);
         newUser.setCreatedAt(Timestamp.from(Instant.now()));
 
