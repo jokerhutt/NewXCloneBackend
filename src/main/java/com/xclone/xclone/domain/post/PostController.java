@@ -84,6 +84,7 @@ public class PostController {
             @RequestParam("text") String text,
             @RequestParam(value = "parentId", required = false) Integer parentId,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
+            @RequestParam(value = "pollChoices", required = false) List<String> pollChoices,
             Authentication auth
     ) throws IOException {
         Integer authUserId = (Integer) auth.getPrincipal();
