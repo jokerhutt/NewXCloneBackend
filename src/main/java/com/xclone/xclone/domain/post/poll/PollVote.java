@@ -21,7 +21,7 @@ public class PollVote {
     @Column(name = "user_id")
     Integer userId;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, insertable = false)
     Timestamp createdAt;
 
     public Integer getId() {

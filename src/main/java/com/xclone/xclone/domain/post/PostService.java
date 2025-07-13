@@ -98,7 +98,7 @@ public class PostService {
         ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
 
         Integer pollId = null;
-        if (pollsRepository.findByPostId(post.getId())) {
+        if (pollsRepository.existsByPostId(post.getId())) {
             pollId = post.getId();
         }
 

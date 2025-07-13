@@ -3,6 +3,7 @@ package com.xclone.xclone.domain.post.poll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -21,6 +22,7 @@ public class PollService {
     public void createNewPollForPost (Integer postId, List<String> pollChoices) {
         Poll poll = new Poll();
         poll.setPostId(postId);
+        poll.setExpiresAt(new Timestamp(System.currentTimeMillis()));
         poll = pollsRepository.save(poll);
         if (poll == null) {throw new IllegalArgumentException("Poll could not be saved");}
 

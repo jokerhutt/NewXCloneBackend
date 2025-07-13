@@ -16,7 +16,7 @@ public class Poll {
     @Column(name = "post_id")
     private Integer postId;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, insertable = false)
     private Timestamp createdAt;
 
     @Column(name = "expires_at")
