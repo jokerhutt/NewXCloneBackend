@@ -2,6 +2,7 @@ package com.xclone.xclone.domain.post;
 
 import com.xclone.xclone.constants.BANNED;
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.post.poll.PollService;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.domain.user.UserDTO;
 import com.xclone.xclone.domain.user.UserService;
@@ -31,13 +32,15 @@ public class PostController {
     private final NotificationService notificationService;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final PollService pollService;
 
     @Autowired
-    public PostController(PostService postService, NotificationService notificationService, PostRepository postRepository, UserService userService) {
+    public PostController(PostService postService, NotificationService notificationService, PostRepository postRepository, UserService userService, PollService pollService) {
         this.postService = postService;
         this.notificationService = notificationService;
         this.postRepository = postRepository;
         this.userService = userService;
+        this.pollService = pollService;
     }
 
     @PostMapping("/get-posts")
@@ -89,6 +92,10 @@ public class PostController {
     ) throws IOException {
         Integer authUserId = (Integer) auth.getPrincipal();
         Post post = postService.createPostEntity(authUserId, text, parentId);
+
+        if (pollChoices != null && parentId == null) {
+            pollService.createNewPollForPost(post.getId(), pollChoices);
+        }
 
         if (images != null && !images.isEmpty()) {
             postService.savePostImages(post.getId(), images);
