@@ -3,4 +3,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PollsRepository extends JpaRepository<Poll, Integer> {
 
+    boolean findByPostId(Integer postId);
 }
