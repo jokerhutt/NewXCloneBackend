@@ -30,4 +30,7 @@ public class PostDTO {
         this.postMedia = postMedia;
         this.pollId = pollId;
     }
+
+
+
 }

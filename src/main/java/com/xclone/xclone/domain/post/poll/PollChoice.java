@@ -17,14 +17,14 @@ public class PollChoice {
     private int voteCount;
 
     @Column(name = "poll_id")
-    private Integer poll_id;
+    private Integer pollId;
 
-    public Integer getPoll_id() {
-        return poll_id;
+    public Integer getPollId() {
+        return pollId;
     }
 
-    public void setPoll_id(Integer poll_id) {
-        this.poll_id = poll_id;
+    public void setPollId(Integer pollId) {
+        this.pollId = pollId;
     }
 
     public Integer getId() {
