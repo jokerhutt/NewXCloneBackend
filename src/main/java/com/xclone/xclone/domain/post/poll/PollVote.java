@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "poll_votes")
-public class PollVote {
+public class    PollVote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,6 +7,7 @@ import com.xclone.xclone.domain.like.Like;
 import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.notification.Notification;
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.post.poll.Poll;
 import com.xclone.xclone.domain.post.poll.PollsRepository;
 import com.xclone.xclone.domain.retweet.Retweet;
 import com.xclone.xclone.domain.retweet.RetweetRepository;
@@ -99,7 +100,12 @@ public class PostService {
 
         Integer pollId = null;
         if (pollsRepository.existsByPostId(post.getId())) {
-            pollId = post.getId();
+            Optional<Poll> postPoll = pollsRepository.findByPostId(post.getId());
+            if (postPoll.isPresent()) {
+                pollId = postPoll.get().getId();
+            } else  {
+                throw new EntityNotFoundException("Poll with id " + post.getId() + " not found");
+            }
         }
 
         for (Like like : likedBy) {
