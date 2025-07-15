@@ -28,12 +28,15 @@ public class PollService {
 
         for (String pollChoice : pollChoices) {
             PollChoice pollChoiceEntity = new PollChoice();
-            pollChoiceEntity.setPoll_id(poll.getId());
+            pollChoiceEntity.setPollId(poll.getId());
             pollChoiceEntity.setVoteCount(0);
             pollChoiceEntity.setChoice(pollChoice);
             pollChoicesRepository.save(pollChoiceEntity);
         }
+    }
 
+    public List<PollChoice> getPollChoices (Integer pollId) {
+        return pollChoicesRepository.findAllByPollId(pollId);
     }
 
 
