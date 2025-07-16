@@ -39,7 +39,6 @@ public class UserService {
         this.postService = postService;
         this.bookmarkService = bookmarkService;
         this.likeService = likeService;
-
         this.retweetService = retweetService;
         this.followRepository = followRepository;
         this.edgeRank = edgeRank;
@@ -76,8 +75,6 @@ public class UserService {
     ) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
-
-
         for (String banned : BANNED.WORDS) {
             if (displayName.toLowerCase().contains(banned) || username.toLowerCase().contains(banned) || bio.toLowerCase().contains(banned)) {
                 throw new IllegalArgumentException("Please dont");
@@ -131,7 +128,6 @@ public class UserService {
         Timestamp cursorTimestamp = new Timestamp(cursor);
         Pageable pageable = PageRequest.of(0, limit);
         List<Integer> userIds = userRepository.findUserIdsByCreatedAtCustom(cursorTimestamp, pageable);
-
 
         Long nextCursor = null;
 

@@ -7,6 +7,8 @@ import com.xclone.xclone.domain.like.Like;
 import com.xclone.xclone.domain.like.LikeRepository;
 import com.xclone.xclone.domain.notification.Notification;
 import com.xclone.xclone.domain.notification.NotificationService;
+import com.xclone.xclone.domain.post.poll.Poll;
+import com.xclone.xclone.domain.post.poll.PollsRepository;
 import com.xclone.xclone.domain.retweet.Retweet;
 import com.xclone.xclone.domain.retweet.RetweetRepository;
 import com.xclone.xclone.domain.user.User;
@@ -31,6 +33,7 @@ public class PostService {
 
     private final CloudStorageService cloudStorageService;
     private final UserRepository userRepository;
+    private final PollsRepository pollsRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -43,7 +46,7 @@ public class PostService {
     private final EdgeRank edgeRank;
 
     @Autowired
-    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank, CloudStorageService cloudStorageService, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, LikeRepository likeRepository, BookmarkRepository bookmarkRepository, NotificationService notificationService, RetweetRepository retweetRepository, PostMediaRepository postMediaRepository, EdgeRank edgeRank, CloudStorageService cloudStorageService, UserRepository userRepository, PollsRepository pollsRepository) {
         this.postRepository = postRepository;
         this.likeRepository = likeRepository;
         this.bookmarkRepository = bookmarkRepository;
@@ -53,6 +56,7 @@ public class PostService {
         this.edgeRank = edgeRank;
         this.cloudStorageService = cloudStorageService;
         this.userRepository = userRepository;
+        this.pollsRepository = pollsRepository;
     }
 
     public PostDTO findPostDTOById(int id) {
@@ -94,6 +98,16 @@ public class PostService {
         ArrayList<Integer> retweeters = new ArrayList<>();
         ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
 
+        Integer pollId = null;
+        if (pollsRepository.existsByPostId(post.getId())) {
+            Optional<Poll> postPoll = pollsRepository.findByPostId(post.getId());
+            if (postPoll.isPresent()) {
+                pollId = postPoll.get().getId();
+            } else  {
+                throw new EntityNotFoundException("Poll with id " + post.getId() + " not found");
+            }
+        }
+
         for (Like like : likedBy) {
             likedByIds.add(like.getLikerId());
         }
@@ -110,7 +124,7 @@ public class PostService {
             retweeters.add(retweet.getRetweeterId());
         }
 
-        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia);
+        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia, pollId);
     }
 
     public ArrayList<Integer> findAllPostsByUserId(int id) {

@@ -15,8 +15,9 @@ public class PostDTO {
     public Integer parentId;
     public ArrayList<Integer> retweetedBy;
     public ArrayList<PostMedia> postMedia;
+    public Integer pollId;
 
-    public PostDTO(Post post, ArrayList<Integer> likedBy, ArrayList<Integer> bookmarkedBy, ArrayList<Integer> replies, ArrayList<Integer> retweetedBy, ArrayList<PostMedia> postMedia) {
+    public PostDTO(Post post, ArrayList<Integer> likedBy, ArrayList<Integer> bookmarkedBy, ArrayList<Integer> replies, ArrayList<Integer> retweetedBy, ArrayList<PostMedia> postMedia, Integer pollId) {
         this.id = post.getId();
         this.userId = post.getUserId();
         this.text = post.getText();
@@ -27,5 +28,9 @@ public class PostDTO {
         this.replies = replies;
         this.retweetedBy = retweetedBy;
         this.postMedia = postMedia;
+        this.pollId = pollId;
     }
+
+
+
 }
