@@ -171,6 +171,7 @@ public class PostService {
         Post post = new Post();
         post.setUserId(userId);
         post.setText(text);
+
         if (parentId != null) {
             post.setParentId(parentId);
         }

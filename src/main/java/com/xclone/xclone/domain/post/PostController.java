@@ -84,17 +84,23 @@ public class PostController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createPost(
-            @RequestParam("text") String text,
+            @RequestParam(value = "text", required = false) String text,
             @RequestParam(value = "parentId", required = false) Integer parentId,
             @RequestParam(value = "images", required = false) List<MultipartFile> images,
             @RequestParam(value = "pollChoices", required = false) List<String> pollChoices,
+            @RequestParam(value = "pollExpiry", required = false) List<String> pollExpiry,
             Authentication auth
     ) throws IOException {
         Integer authUserId = (Integer) auth.getPrincipal();
         Post post = postService.createPostEntity(authUserId, text, parentId);
 
-        if (pollChoices != null && parentId == null) {
-            pollService.createNewPollForPost(post.getId(), pollChoices);
+        if (text.length() < 1 && images == null) {
+            throw new IllegalStateException("Text or images are mandatory");
+        }
+
+        if (pollChoices != null && parentId == null && pollExpiry == null) {
+            pollService.createNewPollForPost(post.getId(), pollChoices, pollExpiry);
+
         }
 
         if (images != null && !images.isEmpty()) {

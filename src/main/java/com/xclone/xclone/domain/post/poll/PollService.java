@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public class PollService {
         this.pollVotesRepository = pollVotesRepository;
     }
 
-    public void createNewPollForPost (Integer postId, List<String> pollChoices) {
+    public void createNewPollForPost (Integer postId, List<String> pollChoices, List<String> pollExpiry) {
         Poll poll = new Poll();
         poll.setPostId(postId);
         poll.setExpiresAt(new Timestamp(System.currentTimeMillis()));
@@ -69,6 +70,16 @@ public class PollService {
         } else {
             return -1;
         }
+    }
+
+    public Timestamp parsePollExpiryToTimeStamp(List<String> pollExpiry) {
+        int days = Integer.parseInt(pollExpiry.get(0));
+        int hours = Integer.parseInt(pollExpiry.get(1));
+        int minutes = Integer.parseInt(pollExpiry.get(2));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiration = now.plusDays(days).plusHours(hours).plusMinutes(minutes);
+        return Timestamp.valueOf(expiration);
     }
 
     public List<PollChoice> getPollChoices (Integer pollId) {
