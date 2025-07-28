@@ -98,7 +98,7 @@ public class PostController {
             throw new IllegalStateException("Text or images are mandatory");
         }
 
-        if (pollChoices != null && parentId == null && pollExpiry == null) {
+        if (pollChoices != null && parentId == null && pollExpiry != null) {
             pollService.createNewPollForPost(post.getId(), pollChoices, pollExpiry);
 
         }
