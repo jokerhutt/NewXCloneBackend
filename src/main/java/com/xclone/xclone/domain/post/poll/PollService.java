@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.xclone.xclone.util.PollUtils.parsePollExpiryToTimeStamp;
+
 @Service
 public class PollService {
 
@@ -71,16 +73,6 @@ public class PollService {
         } else {
             return -1;
         }
-    }
-
-    public Timestamp parsePollExpiryToTimeStamp(List<String> pollExpiry) {
-        int days = Integer.parseInt(pollExpiry.get(0));
-        int hours = Integer.parseInt(pollExpiry.get(1));
-        int minutes = Integer.parseInt(pollExpiry.get(2));
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiration = now.plusDays(days).plusHours(hours).plusMinutes(minutes);
-        return Timestamp.valueOf(expiration);
     }
 
     public List<PollChoice> getPollChoices (Integer pollId) {

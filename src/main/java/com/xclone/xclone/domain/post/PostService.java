@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static com.xclone.xclone.util.PollUtils.checkPollExpiry;
+
 @Service
 public class PostService {
 
@@ -254,10 +256,6 @@ public class PostService {
 
             postMediaRepository.save(media);
         }
-    }
-
-    public boolean checkPollExpiry (Poll poll) {
-        return poll.getExpiresAt().before(new Timestamp(System.currentTimeMillis()));
     }
 
 }
