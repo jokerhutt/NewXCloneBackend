@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -99,10 +100,14 @@ public class PostService {
         ArrayList<PostMedia> postMedia = postMediaRepository.findAllByPostId(post.getId());
 
         Integer pollId = null;
+
+        boolean isExpired = false;
+
         if (pollsRepository.existsByPostId(post.getId())) {
             Optional<Poll> postPoll = pollsRepository.findByPostId(post.getId());
             if (postPoll.isPresent()) {
                 pollId = postPoll.get().getId();
+                isExpired = checkPollExpiry(postPoll.get());
             } else  {
                 throw new EntityNotFoundException("Poll with id " + post.getId() + " not found");
             }
@@ -124,7 +129,7 @@ public class PostService {
             retweeters.add(retweet.getRetweeterId());
         }
 
-        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia, pollId);
+        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia, pollId, isExpired);
     }
 
     public ArrayList<Integer> findAllPostsByUserId(int id) {
@@ -249,6 +254,10 @@ public class PostService {
 
             postMediaRepository.save(media);
         }
+    }
+
+    public boolean checkPollExpiry (Poll poll) {
+        return poll.getExpiresAt().before(new Timestamp(System.currentTimeMillis()));
     }
 
 }

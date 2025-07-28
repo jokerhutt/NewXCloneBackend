@@ -16,8 +16,9 @@ public class PostDTO {
     public ArrayList<Integer> retweetedBy;
     public ArrayList<PostMedia> postMedia;
     public Integer pollId;
+    public boolean isPollExpired;
 
-    public PostDTO(Post post, ArrayList<Integer> likedBy, ArrayList<Integer> bookmarkedBy, ArrayList<Integer> replies, ArrayList<Integer> retweetedBy, ArrayList<PostMedia> postMedia, Integer pollId) {
+    public PostDTO(Post post, ArrayList<Integer> likedBy, ArrayList<Integer> bookmarkedBy, ArrayList<Integer> replies, ArrayList<Integer> retweetedBy, ArrayList<PostMedia> postMedia, Integer pollId, boolean isPollExpired) {
         this.id = post.getId();
         this.userId = post.getUserId();
         this.text = post.getText();
@@ -29,6 +30,7 @@ public class PostDTO {
         this.retweetedBy = retweetedBy;
         this.postMedia = postMedia;
         this.pollId = pollId;
+        this.isPollExpired = isPollExpired;
     }
 
 

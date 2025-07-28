@@ -28,13 +28,14 @@ public class PollService {
     public void createNewPollForPost (Integer postId, List<String> pollChoices, List<String> pollExpiry) {
         Poll poll = new Poll();
         poll.setPostId(postId);
-        poll.setExpiresAt(new Timestamp(System.currentTimeMillis()));
+        poll.setExpiresAt(parsePollExpiryToTimeStamp(pollExpiry));
         poll = pollsRepository.save(poll);
         if (poll == null) {throw new IllegalArgumentException("Poll could not be saved");}
 
         for (String pollChoice : pollChoices) {
             PollChoice pollChoiceEntity = new PollChoice();
             pollChoiceEntity.setPollId(poll.getId());
+
             pollChoiceEntity.setVoteCount(0);
             pollChoiceEntity.setChoice(pollChoice);
             pollChoicesRepository.save(pollChoiceEntity);
