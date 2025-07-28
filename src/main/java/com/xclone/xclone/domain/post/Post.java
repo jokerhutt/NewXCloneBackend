@@ -19,7 +19,7 @@ public class Post {
     @Column(name = "parent_id")
     private Integer parentId;
 
-    @Column(nullable = false, length = 180)
+    @Column(length = 180)
     private String text;
 
     @Column(name = "created_at", updatable = false, insertable = false)
