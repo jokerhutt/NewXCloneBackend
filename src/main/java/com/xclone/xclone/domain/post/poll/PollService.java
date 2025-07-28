@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.xclone.xclone.util.PollUtils.checkPollExpiry;
 import static com.xclone.xclone.util.PollUtils.parsePollExpiryToTimeStamp;
 
 @Service
@@ -46,6 +47,14 @@ public class PollService {
 
     @Transactional
     public List<PollChoice> submitPollVote(Integer voterId, Integer choiceId, Integer pollId) {
+
+        Optional<Poll> pollToCheck = pollsRepository.findById(pollId);
+        if (pollToCheck.isPresent()) {
+            Poll poll = pollToCheck.get();
+            if (checkPollExpiry(poll)) {
+                throw new EntityNotFoundException("Poll has Expired");
+            }
+        }
 
         boolean hasVoted = pollVotesRepository.existsByUserIdAndPollId(voterId, pollId);
         if (hasVoted) {
