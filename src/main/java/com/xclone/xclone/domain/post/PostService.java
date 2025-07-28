@@ -103,13 +103,13 @@ public class PostService {
 
         Integer pollId = null;
 
-        boolean isExpired = false;
+        Timestamp pollExpiryTimeStamp = null;
 
         if (pollsRepository.existsByPostId(post.getId())) {
             Optional<Poll> postPoll = pollsRepository.findByPostId(post.getId());
             if (postPoll.isPresent()) {
                 pollId = postPoll.get().getId();
-                isExpired = checkPollExpiry(postPoll.get());
+                pollExpiryTimeStamp = postPoll.get().getExpiresAt();
             } else  {
                 throw new EntityNotFoundException("Poll with id " + post.getId() + " not found");
             }
@@ -131,7 +131,7 @@ public class PostService {
             retweeters.add(retweet.getRetweeterId());
         }
 
-        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia, pollId, isExpired);
+        return new PostDTO(post, likedByIds, bookmarkIds, repliesIds, retweeters, postMedia, pollId, pollExpiryTimeStamp);
     }
 
     public ArrayList<Integer> findAllPostsByUserId(int id) {
