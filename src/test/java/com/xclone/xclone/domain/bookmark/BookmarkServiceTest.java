@@ -50,6 +50,7 @@ public class BookmarkServiceTest extends AbstractServiceTest {
         assertEquals(2, result.size());
         assertTrue(result.contains(1));
         assertTrue(result.contains(2));
+
     }
 
 

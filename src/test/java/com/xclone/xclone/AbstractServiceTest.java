@@ -1,0 +1,46 @@
+package com.xclone.xclone;
+
+import com.xclone.xclone.domain.bookmark.BookmarkRepository;
+import com.xclone.xclone.domain.post.PostDTOFactory;
+import com.xclone.xclone.domain.post.PostRepository;
+import com.xclone.xclone.domain.user.UserRepository;
+import com.xclone.xclone.utils.TestConstants;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.List;
+
+@SpringBootTest
+@RunWith(SpringRunner.class)
+public class AbstractServiceTest {
+
+    @MockitoBean
+    public BookmarkRepository bookmarkRepository;
+
+    @MockitoBean
+    public UserRepository userRepository;
+
+    @MockitoBean
+    public PostRepository postRepository;
+
+    @MockitoBean
+    public PostDTOFactory postDTOFactory;
+
+    public static final PageRequest pageable = PageRequest.of(0, 10);
+    public static final List<Long> ids = List.of(1L, 2L, 3L);
+
+    @Before
+    public void setUp() {
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(mockRequest));
+    }
+
+
+}

@@ -27,7 +27,6 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-
     @PostMapping("/google-login")
     public ResponseEntity<?> authenticateWithGoogle(@RequestBody Map<String, String> body) {
         String accessToken = body.get("token");
