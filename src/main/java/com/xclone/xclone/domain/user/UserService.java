@@ -94,6 +94,11 @@ public class UserService {
         }
 
         user.setDisplayName(displayName);
+
+        if (user.getBio() == null || user.getBio().equals("")) {
+            user.setBio(" ");
+        }
+        
         user.setBio(bio);
 
         if (profilePicture != null && !profilePicture.isEmpty()) {
@@ -182,7 +187,5 @@ public class UserService {
     void generateFeed(Integer userId) {
         edgeRank.generateFeed(userId);
     }
-
-
 
 }
