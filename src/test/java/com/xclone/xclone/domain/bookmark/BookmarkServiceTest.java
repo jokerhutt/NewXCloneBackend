@@ -4,12 +4,15 @@ import com.xclone.xclone.AbstractServiceTest;
 import com.xclone.xclone.domain.post.Post;
 import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.user.User;
+import com.xclone.xclone.helpers.ServiceLayerHelper;
 import com.xclone.xclone.utils.TestConstants;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +27,7 @@ public class BookmarkServiceTest extends AbstractServiceTest {
     private static Post post;
     private static User authUser;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         super.setUp();
@@ -41,7 +44,7 @@ public class BookmarkServiceTest extends AbstractServiceTest {
 
     @Test
     public void GetAllUserBookmarkedPosts() {
-        ArrayList<Bookmark> mockBookmarks = new ArrayList<>();
+        ArrayList<Bookmark> mockBookmarks = ServiceLayerHelper.createMockBookmarkList();
 
         when(bookmarkRepository.findAllByBookmarkedBy(TestConstants.USER_ID)).thenReturn(mockBookmarks);
 

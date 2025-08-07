@@ -7,6 +7,7 @@ import com.xclone.xclone.utils.TestConstants;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ServiceLayerHelper {
         return post;
     }
 
-    public static List<Bookmark> createMockBookmarkList() {
+    public static ArrayList<Bookmark> createMockBookmarkList() {
         User user = createMockUser();
         Post post1 = createMockPost(1, user.getId());
         Post post2 = createMockPost(2, user.getId());
@@ -47,6 +48,6 @@ public class ServiceLayerHelper {
         bookmark2.setBookmarkedPost(post2.getId());
         bookmark2.setCreatedAt(Timestamp.from(Instant.now()));
 
-        return Arrays.asList(bookmark1, bookmark2);
+        return new ArrayList<>(Arrays.asList(bookmark1, bookmark2));
     }
 }
