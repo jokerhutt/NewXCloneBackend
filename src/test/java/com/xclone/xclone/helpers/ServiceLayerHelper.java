@@ -2,6 +2,7 @@ package com.xclone.xclone.helpers;
 
 import com.xclone.xclone.domain.bookmark.Bookmark;
 import com.xclone.xclone.domain.post.Post;
+import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.utils.TestConstants;
 
@@ -50,4 +51,27 @@ public class ServiceLayerHelper {
 
         return new ArrayList<>(Arrays.asList(bookmark1, bookmark2));
     }
+
+    public static PostDTO createMockPostDTO() {
+        Post post = createMockPost(TestConstants.TWEET_ID, TestConstants.USER_ID);
+        return new PostDTO(
+                post,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+    }
+
+    public static PostDTO createMockPostDTOWithBookmarks(Integer... ids) {
+        PostDTO dto = createMockPostDTO();
+        dto.bookmarkedBy.addAll(Arrays.asList(ids));
+        return dto;
+    }
+
+
+
 }
