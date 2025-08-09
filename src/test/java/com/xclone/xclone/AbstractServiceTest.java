@@ -3,12 +3,14 @@ package com.xclone.xclone;
 import com.xclone.xclone.domain.bookmark.BookmarkRepository;
 import com.xclone.xclone.domain.post.PostDTOFactory;
 import com.xclone.xclone.domain.post.PostRepository;
+import com.xclone.xclone.domain.post.PostService;
 import com.xclone.xclone.domain.user.UserRepository;
 import com.xclone.xclone.utils.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +38,9 @@ public class AbstractServiceTest {
 
     @MockitoBean
     public PostDTOFactory postDTOFactory;
+
+    @MockitoBean
+    public PostService postService;
 
     public static final PageRequest pageable = PageRequest.of(0, 10);
     public static final List<Long> ids = List.of(1L, 2L, 3L);

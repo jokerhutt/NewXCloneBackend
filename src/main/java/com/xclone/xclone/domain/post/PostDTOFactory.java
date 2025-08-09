@@ -44,11 +44,6 @@ public class PostDTOFactory {
         this.pollsRepository = pollsRepository;
     }
 
-    public PostDTO fromPostId(Integer postId) {
-        Post post = postRepository.findById(postId).orElseThrow(EntityNotFoundException::new);
-        return fromPost(post);
-    }
-
     public PostDTO fromPost(Post post) {
         ArrayList<Integer> likedByIds = likeRepository.findAllByLikedPostId(post.getId())
                 .stream().map(Like::getLikerId).collect(Collectors.toCollection(ArrayList::new));

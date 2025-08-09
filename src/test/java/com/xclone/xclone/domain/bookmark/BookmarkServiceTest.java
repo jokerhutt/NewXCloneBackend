@@ -9,15 +9,12 @@ import com.xclone.xclone.utils.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class BookmarkServiceTest extends AbstractServiceTest {
 
@@ -43,19 +40,16 @@ public class BookmarkServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void GetAllUserBookmarkedPosts() {
+    public void getBookMarkIds_ShouldReturnAllUserBookmarkedIds() {
         ArrayList<Bookmark> mockBookmarks = ServiceLayerHelper.createMockBookmarkList();
 
         when(bookmarkRepository.findAllByBookmarkedBy(TestConstants.USER_ID)).thenReturn(mockBookmarks);
 
-        ArrayList<Integer> result = bookmarkService.getAllUserBookmarks(TestConstants.USER_ID);
+        ArrayList<Integer> result = bookmarkService.getAllUserBookmarkedIds(TestConstants.USER_ID);
 
         assertEquals(2, result.size());
         assertTrue(result.contains(1));
         assertTrue(result.contains(2));
 
     }
-
-
-
 }
