@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class PostDTOFactory {
+public class PostDTOMapper {
 
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
@@ -28,7 +28,7 @@ public class PostDTOFactory {
     private final PollsRepository pollsRepository;
 
     @Autowired
-    public PostDTOFactory(
+    public PostDTOMapper(
             LikeRepository likeRepository,
             BookmarkRepository bookmarkRepository,
             PostRepository postRepository,
@@ -42,6 +42,11 @@ public class PostDTOFactory {
         this.retweetRepository = retweetRepository;
         this.postMediaRepository = postMediaRepository;
         this.pollsRepository = pollsRepository;
+    }
+
+    public PostDTO fromPostId(Integer id) {
+        Post foundPost =  postRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        return fromPost(foundPost);
     }
 
     public PostDTO fromPost(Post post) {
