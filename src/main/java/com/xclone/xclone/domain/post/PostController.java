@@ -68,6 +68,10 @@ public class PostController {
     public ResponseEntity<?> pinPost(@RequestParam Integer postId, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
 
+        System.out.println("JWT says userId = " + authUserId);
+        System.out.println("Post ID = " + postId);
+
+
         User toReturn = postService.handlePinPost(postId, authUserId, false);
         UserDTO userToReturn = userService.generateUserDTOByUserId(toReturn.getId());
         return ResponseEntity.ok(userToReturn);
@@ -76,6 +80,9 @@ public class PostController {
     @PostMapping("/unpin")
     public ResponseEntity<?> unpinPost(@RequestParam Integer postId, Authentication auth) {
         Integer authUserId = (Integer) auth.getPrincipal();
+
+        System.out.println("JWT says userId = " + authUserId);
+        System.out.println("Post ID = " + postId);
 
         User toReturn = postService.handlePinPost(postId, authUserId, true);
         UserDTO userToReturn = userService.generateUserDTOByUserId(toReturn.getId());

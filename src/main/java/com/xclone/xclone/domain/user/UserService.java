@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -47,7 +46,7 @@ public class UserService {
 
     private UserDTO createUserDTO(User user) {
         ArrayList<Integer> userPosts = postService.findAllPostsByUserId(user.getId());
-        ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarks(user.getId());
+        ArrayList<Integer> userBookmarks = bookmarkService.getAllUserBookmarkedIds(user.getId());
         ArrayList<Integer> userLikes = likeService.getAllUserLikes(user.getId());
         ArrayList<Follow> userFollowing = followRepository.findAllByFollowerId(user.getId());
         ArrayList<Integer> userFollowingIds = new ArrayList<>();

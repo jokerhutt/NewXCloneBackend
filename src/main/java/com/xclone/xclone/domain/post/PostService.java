@@ -21,9 +21,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -196,10 +198,16 @@ public class PostService {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) throw new EntityNotFoundException("Post not found");
         Post retrievedPost = post.get();
-        if (retrievedPost.getUserId() !=  pinnerId) throw new IllegalArgumentException("Failed, not post owner");
+        System.out.println("Retrieving post by ID: " + retrievedPost.getId());
+        System.out.println("Retrieving post by user ID: " + retrievedPost.getUserId());
+        if (!Objects.equals(retrievedPost.getUserId(), pinnerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not post owner");
+        }
 
         User user = userRepository.findById(pinnerId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+
 
         if (delete) {
             user.setPinnedPostId(null);

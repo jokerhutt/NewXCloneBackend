@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,7 +37,7 @@ public class NotificationService {
             return false;
         }
 
-        if (newNotification.senderId == newNotification.receiverId) {
+        if (Objects.equals(newNotification.senderId, newNotification.receiverId)) {
             return false;
         }
 
