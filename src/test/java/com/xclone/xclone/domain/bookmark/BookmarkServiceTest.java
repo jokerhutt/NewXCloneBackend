@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static com.xclone.xclone.helpers.ExceptionAssertHelper.assertIllegalState;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -52,4 +53,70 @@ public class BookmarkServiceTest extends AbstractServiceTest {
         assertTrue(result.contains(2));
 
     }
+
+    @Test
+    public void addNewBookmark_ShouldSaveBookmarkAndReturnDto() {
+        Integer userId = authUser.getId();
+        Integer postId = post.getId();
+
+        when(bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, postId))
+                .thenReturn(false);
+
+        PostDTO mockDto = ServiceLayerHelper.createMockPostDTOWithBookmarks(userId);
+        when(postService.findPostDTOById(postId))
+                .thenReturn(mockDto);
+
+        PostDTO result = bookmarkService.addNewBookmark(userId, postId);
+
+        assertSame(mockDto, result); // same object returned
+        verify(bookmarkRepository).save(any(Bookmark.class));
+        verify(postService).findPostDTOById(postId);
+    }
+
+    @Test
+    void deleteBookmark_ShouldDeleteAndReturnDto() {
+        Integer userId = authUser.getId();
+        Integer postId = post.getId();
+
+        Bookmark existing = new Bookmark();
+        when(bookmarkRepository.findByBookmarkedByAndBookmarkedPost(userId, postId))
+                .thenReturn(Optional.of(existing));
+
+        PostDTO dto = ServiceLayerHelper.createMockPostDTO();
+        when(postService.findPostDTOById(postId)).thenReturn(dto);
+
+        PostDTO result = bookmarkService.deleteBookmark(userId, postId);
+
+        assertSame(dto, result);
+        verify(bookmarkRepository).delete(existing);
+        verify(postService).findPostDTOById(postId);
+    }
+
+    @Test
+    void addBookmark_ShouldThrow_WhenExists() {
+
+        Integer userId = authUser.getId();
+        Integer postId = post.getId();
+
+        when(bookmarkRepository.existsByBookmarkedByAndBookmarkedPost(userId, postId))
+                .thenReturn(true);
+
+        assertIllegalState(() -> bookmarkService.addNewBookmark(userId, postId));
+
+    }
+
+    @Test
+    void deleteBookmark_ShouldThrow_WhenNotFound() {
+        Integer userId = authUser.getId();
+        Integer postId = post.getId();
+
+        when(bookmarkRepository.findByBookmarkedByAndBookmarkedPost(userId, postId))
+                .thenReturn(Optional.empty());
+
+        assertIllegalState(() -> bookmarkService.deleteBookmark(userId, postId));
+    }
+
+
+
+
 }
