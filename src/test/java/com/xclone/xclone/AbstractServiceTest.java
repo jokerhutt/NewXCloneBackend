@@ -1,20 +1,18 @@
 package com.xclone.xclone;
 
 import com.xclone.xclone.domain.bookmark.BookmarkRepository;
-import com.xclone.xclone.domain.post.PostDTOFactory;
+import com.xclone.xclone.domain.post.PostDTOMapper;
 import com.xclone.xclone.domain.post.PostRepository;
+import com.xclone.xclone.domain.post.PostService;
 import com.xclone.xclone.domain.user.UserRepository;
-import com.xclone.xclone.utils.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -35,7 +33,10 @@ public class AbstractServiceTest {
     public PostRepository postRepository;
 
     @MockitoBean
-    public PostDTOFactory postDTOFactory;
+    public PostDTOMapper postDTOMapper;
+
+    @MockitoBean
+    public PostService postService;
 
     public static final PageRequest pageable = PageRequest.of(0, 10);
     public static final List<Long> ids = List.of(1L, 2L, 3L);

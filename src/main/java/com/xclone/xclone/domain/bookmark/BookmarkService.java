@@ -21,7 +21,7 @@ public class BookmarkService {
         this.postService = postService;
     }
 
-    public ArrayList<Integer> getAllUserBookmarks (Integer userId) {
+    public ArrayList<Integer> getAllUserBookmarkedIds(Integer userId) {
         ArrayList<Integer> bookmarkIds = new ArrayList<>();
         ArrayList<Bookmark> bookmarks =  bookmarkRepository.findAllByBookmarkedBy(userId);
         for (Bookmark bookmark : bookmarks) {

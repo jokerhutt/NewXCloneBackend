@@ -2,6 +2,7 @@ package com.xclone.xclone.helpers;
 
 import com.xclone.xclone.domain.bookmark.Bookmark;
 import com.xclone.xclone.domain.post.Post;
+import com.xclone.xclone.domain.post.PostDTO;
 import com.xclone.xclone.domain.user.User;
 import com.xclone.xclone.utils.TestConstants;
 
@@ -14,40 +15,70 @@ import java.util.List;
 public class ServiceLayerHelper {
 
     public static User createMockUser() {
-        User user = new User();
-        user.setId(TestConstants.USER_ID);
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        user.setDisplayName("Test User");
-        return user;
+        User userEntity = new User();
+        userEntity.setId(TestConstants.USER_ID);
+        userEntity.setUsername(TestConstants.USERNAME);
+        userEntity.setEmail(TestConstants.USER_EMAIL);
+        userEntity.setDisplayName(TestConstants.DISPLAY_NAME);
+        return userEntity;
     }
 
-    public static Post createMockPost(Integer postId, Integer userId) {
-        Post post = new Post();
-        post.setId(postId);
-        post.setUserId(userId);
-        post.setText("This is a test post");
-        post.setParentId(null);
-        return post;
+    public static Post createMockPost(Integer postId, Integer ownerUserId) {
+        Post postEntity = new Post();
+        postEntity.setId(postId);
+        postEntity.setUserId(ownerUserId);
+        postEntity.setText(TestConstants.TWEET_TEXT);
+        postEntity.setParentId(null);
+        return postEntity;
     }
 
     public static ArrayList<Bookmark> createMockBookmarkList() {
-        User user = createMockUser();
-        Post post1 = createMockPost(1, user.getId());
-        Post post2 = createMockPost(2, user.getId());
+        User authorUser = createMockUser();
 
-        Bookmark bookmark1 = new Bookmark();
-        bookmark1.setId(1);
-        bookmark1.setBookmarkedBy(user.getId());
-        bookmark1.setBookmarkedPost(post1.getId());
-        bookmark1.setCreatedAt(Timestamp.from(Instant.now()));
+        Post firstPost = createMockPost(1, authorUser.getId());
+        Post secondPost = createMockPost(2, authorUser.getId());
 
-        Bookmark bookmark2 = new Bookmark();
-        bookmark2.setId(2);
-        bookmark2.setBookmarkedBy(user.getId());
-        bookmark2.setBookmarkedPost(post2.getId());
-        bookmark2.setCreatedAt(Timestamp.from(Instant.now()));
+        Bookmark firstBookmark = new Bookmark();
+        firstBookmark.setId(1);
+        firstBookmark.setBookmarkedBy(authorUser.getId());
+        firstBookmark.setBookmarkedPost(firstPost.getId());
+        firstBookmark.setCreatedAt(Timestamp.from(TestConstants.TIME_1));
 
-        return new ArrayList<>(Arrays.asList(bookmark1, bookmark2));
+        Bookmark secondBookmark = new Bookmark();
+        secondBookmark.setId(2);
+        secondBookmark.setBookmarkedBy(authorUser.getId());
+        secondBookmark.setBookmarkedPost(secondPost.getId());
+        secondBookmark.setCreatedAt(Timestamp.from(TestConstants.TIME_2));
+
+        return new ArrayList<>(Arrays.asList(firstBookmark, secondBookmark));
+    }
+
+    public static PostDTO createMockPostDTO() {
+        Post sourcePost = createMockPost(TestConstants.TWEET_ID, TestConstants.USER_ID);
+        return new PostDTO(
+                sourcePost,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                null,
+                null
+        );
+    }
+
+    public static PostDTO createMockPostDTOWithBookmarks(Integer... bookmarkedUserIds) {
+        PostDTO postDto = createMockPostDTO();
+        postDto.bookmarkedBy.addAll(Arrays.asList(bookmarkedUserIds));
+        return postDto;
+    }
+
+    public static Bookmark createMockBookmark(Integer bookmarkId, Integer userId, Integer postId, Instant createdAt) {
+        Bookmark bookmarkEntity = new Bookmark();
+        bookmarkEntity.setId(bookmarkId);
+        bookmarkEntity.setBookmarkedBy(userId);
+        bookmarkEntity.setBookmarkedPost(postId);
+        bookmarkEntity.setCreatedAt(Timestamp.from(createdAt));
+        return bookmarkEntity;
     }
 }

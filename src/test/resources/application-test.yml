@@ -6,12 +6,29 @@ x:
     token: test-token
 
 spring:
+  test:
+    database:
+      replace: NONE
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
     driver-class-name: org.h2.Driver
     username: sa
     password:
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 5
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate: OFF
+    org.mockito: ERROR

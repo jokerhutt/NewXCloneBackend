@@ -18,7 +18,7 @@ public class Bookmark {
     @Column(name = "bookmarked_post")
     private Integer bookmarkedPost;
 
-    @Column(name = "created_at", updatable = false, insertable = false)
+    @Column(name = "created_at", updatable = false, insertable = true)
     private Timestamp createdAt;
 
     public Integer getId() {
