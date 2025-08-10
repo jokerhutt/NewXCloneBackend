@@ -68,7 +68,7 @@ public class BookmarkServiceTest extends AbstractServiceTest {
 
         PostDTO result = bookmarkService.addNewBookmark(userId, postId);
 
-        assertSame(mockDto, result); // same object returned
+        assertSame(mockDto, result);
         verify(bookmarkRepository).save(any(Bookmark.class));
         verify(postService).findPostDTOById(postId);
     }
